@@ -1,38 +1,30 @@
 package com.example.maptest;
 
+import static com.example.maptest.Constants.MAPS_PACKAGE;
+import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
+import static com.example.maptest.Constants.REROUTING;
+
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-
-import static com.example.maptest.Constants.ICON_NULL;
-import static com.example.maptest.Constants.MAPS_PACKAGE;
-import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
-import static com.example.maptest.Constants.REROUTING;
 
 public class NotificationMonitor extends NotificationListenerService {
 
     private static final String TAG = "NotificationMonitor";
-    static Drawable currIcon = null;
+    //static Drawable currIcon = null;
     Context context;
     String notificationTitle = "";//title of previous notification
     HashSet<String> titleSet;
+    public static NotificationMonitor notificationMonitor;
 
     @Override
     public void onListenerConnected() {
@@ -51,7 +43,8 @@ public class NotificationMonitor extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        titleSet = new HashSet<String>();
+        titleSet = new HashSet<>();
+        notificationMonitor = this;
     }
 
     @Override
@@ -67,22 +60,26 @@ public class NotificationMonitor extends NotificationListenerService {
                 Bundle extras = notification.extras;
 
                 //Extracting title, text and icon
-                String title = extras.getString("android.title") == null ? "ANDROID_TITLE_NOT_FOUND" : extras.getString("android.title");
-                String text = extras.getString("android.text") == null ? "ANDROID_TEXT_NOT_FOUND" : extras.getString("android.text");
+                CharSequence titleCS = extras.getCharSequence("android.title");
+                String title = titleCS == null ? "ANDROID_TITLE_NOT_FOUND" : titleCS.toString();
+                CharSequence textCS = extras.getCharSequence("android.text");
+                String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
                 Icon icon = notification.getLargeIcon();
                 String type = REROUTING.equals(title) ? REROUTING : title;
 
                 if (!notificationTitle.equals(title)) {
                     notificationTitle = title;
                     //create an intent object for broadcasting
-                    Intent msgrcv = createNotificationIntent(type,title,text,icon);
+                    Intent msgrcv = createNotificationIntent(type, title, text, icon);
 
                     //broadcast notification intent
-                    Log.d(TAG, "onNotificationPosted: title : "+title);
-                    Log.d(TAG, "onNotificationPosted: text : "+text);
-                    Log.d(TAG, "onNotificationPosted: type : "+type);
+                    Log.d(TAG, "onNotificationPosted: title : " + title);
+                    Log.d(TAG, "onNotificationPosted: text : " + text);
+                    Log.d(TAG, "onNotificationPosted: type : " + type);
 
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
+//                    LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
+                    context.sendBroadcast(msgrcv);
+                    Log.d(TAG, "onNotificationPosted: broadcast " + title);
                 }
             }
 
@@ -97,7 +94,7 @@ public class NotificationMonitor extends NotificationListenerService {
                 .putExtra("text", text);
         if (!REROUTING.equals(type)) {
             intent.putExtra("icon", icon);
-        }else{
+        } else {
             Log.d(TAG, "createNotificationIntent: Icon NULL");
         }
         return intent;

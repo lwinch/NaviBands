@@ -1,5 +1,8 @@
 package com.example.maptest;
 
+import static com.example.maptest.App.CHANNEL_ID;
+import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -7,16 +10,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
+import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import static com.example.maptest.App.CHANNEL_ID;
-import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
 
 /*
  * This class is for showing notifications while service is running
@@ -38,9 +37,9 @@ public class ForegroundService extends Service {
         Log.d(TAG, "onCreate: Created Foreground Service");
         context = getApplicationContext();
         notificationReceiver = new NotificationReceiver();
-        IntentFilter notificationIntentFilter = new IntentFilter(NOTIFICATION_RECEIVED);//NOTIFICATION_RECEIVED
-        LocalBroadcastManager.getInstance(context).registerReceiver(notificationReceiver, notificationIntentFilter);
-        context.registerReceiver(test, notificationIntentFilter);
+        IntentFilter notificationIntentFilter = new IntentFilter(NOTIFICATION_RECEIVED);
+        context.registerReceiver(notificationReceiver, notificationIntentFilter, Context.RECEIVER_EXPORTED);
+        context.registerReceiver(test, notificationIntentFilter, Context.RECEIVER_NOT_EXPORTED);
     }
 
     @Override
@@ -48,17 +47,15 @@ public class ForegroundService extends Service {
         Log.d(TAG, "onStartCommand: Started Foreground Service");
         String title = intent.getStringExtra("title");
         String text = intent.getStringExtra("text");
-        Log.d(TAG, "onStartCommand: "+title+" | "+text);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(flags);
-        }
+        Log.d(TAG, "onStartCommand: " + title + " | " + text);
+        stopForeground(flags);
         showNotification(this, title, text);
         return START_STICKY;
     }
 
     private void showNotification(Context context, String title, String text) {
         Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(title)
@@ -68,12 +65,14 @@ public class ForegroundService extends Service {
                 .setOnlyAlertOnce(true)
                 .build();
 
-        startForeground(69, notification);
+
+        startForeground(69, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
     }
 
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy: Destroying Foreground service");
+        context.unregisterReceiver(notificationReceiver);
         context.unregisterReceiver(test);
         super.onDestroy();
     }
@@ -85,7 +84,7 @@ public class ForegroundService extends Service {
         return null;
     }
 
-    class NotificationReceiver extends BroadcastReceiver {
+    static class NotificationReceiver extends BroadcastReceiver {
         private static final String TAG = "NotificationReceiver";
 
         @Override

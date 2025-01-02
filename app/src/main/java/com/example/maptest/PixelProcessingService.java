@@ -1,5 +1,10 @@
 package com.example.maptest;
 
+import static com.example.maptest.Constants.DIRECTION_BROADCAST;
+import static com.example.maptest.Constants.DIRECTION_KNOWN;
+import static com.example.maptest.Constants.ICON_NULL;
+import static com.example.maptest.Constants.REROUTING;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,12 +15,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,13 +26,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.example.maptest.Constants.DIRECTION_BROADCAST;
-import static com.example.maptest.Constants.DIRECTION_KNOWN;
-import static com.example.maptest.Constants.ICON_NULL;
-import static com.example.maptest.Constants.REROUTING;
+import java.util.Locale;
 
 public class PixelProcessingService {
     private static final String TAG = "PixelProcessingService";
@@ -113,15 +109,15 @@ public class PixelProcessingService {
         Log.d(TAG, "getDirection: Inside PixelProcessingService");
         //return if Map is rerouting
         if (REROUTING.equals(intent.getStringExtra("type"))) {
-            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", REROUTING));
+            context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", REROUTING));
             return;
         }
 
         //terminate if icon is null
-        Icon ic = (Icon) intent.getParcelableExtra("icon");
+        Icon ic = intent.getParcelableExtra("icon", Icon.class);
         if (ic == null) {
             Log.d(TAG, "getDirection: Icon Null , Stopping work");
-            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", ICON_NULL));
+            context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", ICON_NULL));
             return;
         }
 
@@ -155,16 +151,18 @@ public class PixelProcessingService {
         jobDoneIntent.putExtra("direction", direction);
         jobDoneIntent.putExtra("title", title);
         jobDoneIntent.putExtra("text", text);
+        jobDoneIntent.putExtra("iconRes", matchingRes);
 
         //broadcast the intent
-        LocalBroadcastManager.getInstance(context).sendBroadcast(jobDoneIntent);
+        context.sendBroadcast(jobDoneIntent);
+        Log.d(TAG, "getDirection: intent broadcast");
     }
 
 
     //Create a File for saving an image or video
     private static File getOutputMediaFile(Context context) {
         //adding random suffix to filename to avoid collision
-        int random = (int) (Math.random() % 1000);
+        long random = (int) (Math.random() % 1000);
         random += System.nanoTime();
         random %= 1000;
         if (random < 0) random = Math.abs(random);
@@ -185,9 +183,9 @@ public class PixelProcessingService {
                 return null;
             }
         }
-        String directoryPath = context.getExternalFilesDir(null).getAbsolutePath() + File.separator;
+        //String directoryPath = context.getExternalFilesDir(null).getAbsolutePath() + File.separator;
         // Create a media file name
-        String timeStamp = (new SimpleDateFormat("ddMMyy_HHmmssss").format(new Date()));
+        String timeStamp = new SimpleDateFormat("ddMMyy_HHmmssss", Locale.US).format(new Date());
         File mediaFile;
         String mImageName = timeStamp + "_" + random + ".PNG";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);

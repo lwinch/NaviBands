@@ -1,20 +1,14 @@
 package com.example.maptest;
 
-import android.app.Application;
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 
 public class CSVUtilities {
     private static final String TAG = "CSVUtilities";

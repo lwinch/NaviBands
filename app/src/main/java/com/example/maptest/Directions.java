@@ -3,7 +3,7 @@ package com.example.maptest;
 import java.util.HashSet;
 
 /**
- * Created by https://github.com/jashgopani/ on 03-07-2020
+ * Created by <a href="https://github.com/jashgopani/">jashgopani</a> on 03-07-2020
  */
 public class Directions{
     /**
@@ -30,8 +30,8 @@ public class Directions{
     public static final String UNKNOWN = "X";
     public static final String ALTERNATE = "LSR";
 
-    private static HashSet<String> leftDirections = new HashSet<>();
-    private static HashSet<String> rightDirections = new HashSet<>();
+    private static final HashSet<String> leftDirections = new HashSet<>();
+    private static final HashSet<String> rightDirections = new HashSet<>();
 
     static {
         leftDirections.add(SLIGHT_LEFT);
@@ -46,15 +46,15 @@ public class Directions{
 
     }
 
-    public static final boolean isLeft(String d){
+    public static boolean isLeft(String d){
         return leftDirections.contains(d);
     }
 
-    public static final boolean isRight(String d){
+    public static boolean isRight(String d){
         return rightDirections.contains(d);
     }
 
-    public static final boolean isUturn(String d){
+    public static boolean isUTurn(String d){
         return d.endsWith("U");
     }
 

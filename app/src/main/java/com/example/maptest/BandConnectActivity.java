@@ -1,14 +1,8 @@
 package com.example.maptest;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
@@ -16,40 +10,35 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import jashgopani.github.io.mibandsdk.MiBand;
-import jashgopani.github.io.mibandsdk.models.CustomVibration;
-import jashgopani.github.io.mibandsdk.models.VibrationMode;
 
 public class BandConnectActivity extends AppCompatActivity implements ScanResultsAdapter.OnScannedDeviceListener{
 
     private static final long SCAN_PERIOD = 6000;
-    private static final int REQUEST_ENABLE_BT = 1;
+    //private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "BandConnectActivity";
-    private Context context = BandConnectActivity.this;
+    private final Context context = BandConnectActivity.this;
     private BluetoothAdapter bluetoothAdapter;
     private ToggleButton scanBtn, connectBtn;
     private TextView statusTv;
@@ -84,12 +73,11 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
     }
 
     private void getPermissions() {
-        String permissions[] ={
+        String[] permissions ={
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.BLUETOOTH_CONNECT,
 
         };
         ActivityCompat.requestPermissions(BandConnectActivity.this, permissions, 0);
@@ -109,7 +97,16 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent =
                     new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+            }
+            BandConnectActivity.this.startActivity(enableBtIntent);
         }
     }
 
@@ -124,17 +121,18 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         paired = miBand.isPaired();
         try{
             currentDevice = miBand.getDevice();
-            Log.d(TAG, "initializeClassFields: "+currentDevice);
+            Log.d(TAG, "initializeClassFields: " + currentDevice);
         }catch (Exception e){
             currentDevice = null;
         }
         disposables = new CompositeDisposable();
         //if band is connected then subscribe to the connection subject to get the live status
-        if(paired)
-        disposables.add(miBand.connect(null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(handleConnectionNext(), handleConnectionError(),handleConnectionComplete()));
+        if (paired) {
+            disposables.add(miBand.connect(null)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(handleConnectionNext(), handleConnectionError(),handleConnectionComplete()));
+        }
         setResult(App.DEVICE_NULL);
     }
 
@@ -157,7 +155,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         scanBtn.setOnClickListener((buttonView) -> {
             boolean isChecked = scanBtn.isChecked();
 
-            Log.d(TAG, "Find Device Btn : "+isChecked);
+            Log.d(TAG, "Find Device Btn : " + isChecked);
             //change the scanning status
             isScanning = isChecked;
 
@@ -200,7 +198,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
     private void connectAndPair() {
         toast("Connecting...");
         updateUIControls();
-        statusTv.setText("Connecting...");
+        statusTv.setText(R.string.connecting);
         deviceArrayList.clear();
         scanResultsAdapter.updateList(deviceArrayList);
         disposables.add(miBand.connect(currentDevice)
@@ -212,7 +210,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
 
     private void disconnectAndUnpair() {
         updateUIControls();
-        updateStatustv("Disconnecting...");
+        updateStatusTv(String.valueOf(R.string.disconnecting));
         miBand.disconnect(true);
         updateUIControls();
     }
@@ -227,7 +225,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         scanBtn.setAlpha(scanBtn.isClickable() ? 1f : 0.2f);
         if(!paired)scanBtn.setChecked(isScanning);
 
-        statusTv.setTextColor(isScanning ? Color.LTGRAY : deviceArrayList.size() > 0 ? Color.BLUE :paired?Color.GREEN:Color.RED);
+        statusTv.setTextColor(isScanning ? Color.LTGRAY : !deviceArrayList.isEmpty() ? Color.BLUE :paired?Color.GREEN:Color.RED);
         connectBtn.setClickable(!isScanning && currentDevice!=null);
         connectBtn.setAlpha(connectBtn.isClickable() ? 1f : 0.2f);
         connectBtn.setChecked(paired);
@@ -235,11 +233,11 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         String mac = currentDevice==null?"":currentDevice.toString();
         connectBtn.setTextOn("Disconnect "+mac);
         connectBtn.setTextOff("Connect "+mac);
-        updateStatustv();
+        updateStatusTv();
     }
 
 
-    private void updateStatustv() {
+    private void updateStatusTv() {
         if (currentDevice == null) {
             statusTv.setText(R.string.status_doScan);
         } else {
@@ -248,14 +246,14 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         }
     }
 
-    private void updateStatustv(String statusText){
+    private void updateStatusTv(String statusText){
         statusTv.setText(statusText);
     }
 
 
     /**
      * Handles click event on Recycler View
-     * @param position
+     * @param position the position of the click
      */
     @Override
     public void onDeviceClick(int position) {
@@ -270,7 +268,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
 
     /**
      * Utility toast method
-     * @param msg
+     * @param msg message that goes in the Toast
      */
     private void toast(final String msg){
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -280,28 +278,25 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
 
     /**
      * Handle onComplete of scanning method
-     * @return
+     * @return action that updates the UI controls
      */
     private Action handleScanComplete() {
-        return new Action() {
-            @Override
-            public void run() throws Throwable {
-                isScanning = false;
-                updateUIControls();
-            }
+        return () -> {
+            isScanning = false;
+            updateUIControls();
         };
     }
 
     /**
      * Handle errors from Scanning method
-     * @return
+     * @return consumer that logs error
      */
     private Consumer<? super Throwable> handleScanError() {
-        return new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Throwable {
-                Log.d(TAG, "Scanning Error Received: \n");
-                throwable.printStackTrace();
+        return (Consumer<Throwable>) throwable -> {
+            Log.d(TAG, "Scanning Error Received: \n");
+            if (throwable != null) {
+                Log.d(TAG, throwable.getMessage());
+                Log.d(TAG, Arrays.toString(throwable.getStackTrace()));
             }
         };
     }
@@ -311,18 +306,15 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
      * @return ScanResult : It is the result given by BLE ScanCallback Use getDevice method to handle
      */
     private Consumer<? super ScanResult> handleScanResult() {
-        return new Consumer<ScanResult>() {
-            @Override
-            public void accept(ScanResult result) throws Throwable {
-                //this method handles the scan results
-                BluetoothDevice device = result.getDevice();
-                if (addressHashSet.add(device.getAddress())) {
-                    deviceArrayList.add(device);
-                    String st = "Found " + deviceArrayList.size() + " devices";
-                    statusTv.setText(st);
-                    Log.d(TAG, "leScanCallBack: New device added : " + device.getAddress());
-                    scanResultsAdapter.updateList(deviceArrayList);
-                }
+        return (Consumer<ScanResult>) result -> {
+            //this method handles the scan results
+            BluetoothDevice device = result.getDevice();
+            if (addressHashSet.add(device.getAddress())) {
+                deviceArrayList.add(device);
+                String st = "Found " + deviceArrayList.size() + " devices";
+                statusTv.setText(st);
+                Log.d(TAG, "leScanCallBack: New device added : " + device.getAddress());
+                scanResultsAdapter.updateList(deviceArrayList);
             }
         };
     }
@@ -339,8 +331,9 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
             if(result==MiBand.PAIRED){
                 paired = true;
                 setResult(App.DEVICE_CONNECTED);
-                if(requestCode!=-1)
-                finish();
+                if (requestCode != -1) {
+                    finish();
+                }
             }else{
                 paired=false;
             }

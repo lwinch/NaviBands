@@ -27,6 +27,9 @@
     <string name="status_paired">PAIRED</string>
     <string name="status_charging">CHARGING</string>
     <string name="status_discharging">DISCHARGING</string>
-
+    <string name="channel_name">map push notifications</string>
+    <string name="channel_description">notification channel for navigation push</string>
+    <string name="connecting">Connecting…</string>
+    <string name="disconnecting">Disconnecting…</string>
 
 </resources>

@@ -1,11 +1,8 @@
 package com.example.maptest;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
 
 class PixelWrapper {
     public ArrayList<Integer> pixels;
@@ -49,12 +46,12 @@ class PixelWrapper {
     @NonNull
     @Override
     public String toString() {
-        if (compressed.length() == 0) compressPixels();
+        if (compressed.isEmpty()) compressPixels();
         return compressed;
     }
 
     public boolean equals(@NonNull PixelWrapper other) {
-        if (this.compressed.length() > 0 && other.compressed.length() > 0) {
+        if (!this.compressed.isEmpty() && !other.compressed.isEmpty()) {
             return this.compressed.equals(other.compressed);
         }
         System.out.println("this object is not compressed");
@@ -88,9 +85,9 @@ class PixelWrapper {
                     } else {
                         if (rleCounter > 1) {//if the value occurs more than once only then append the count
                             rleString.append(prev);
-                            rleString.append("{" + rleCounter + "}");
-                        } else {//if the value occured only once dont append count
-                            rleString.append("("+prev+")");
+                            rleString.append("{").append(rleCounter).append("}");
+                        } else {//if the value occurred only once don't append count
+                            rleString.append("(").append(prev).append(")");
                         }
                         rleCounter = 1;
                     }
