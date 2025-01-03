@@ -148,38 +148,30 @@ public class ForegroundService extends Service {
                 ForegroundService.this.sendNotification(context, title, text, iconRes, icon);
                 newData.append(REROUTING).append("\n\n");
             }
-            else if (iconRes == -1) {
-                Log.d(TAG, "onReceive: Intent is ICON_NULL");
-                newData.append(DIRECTION_UNKNOWN).append( "\n\n");
-            }
-            else {
+            else if (title != null && title.indexOf(" ") > 0) {
                 String direction = IconDataset.directionNames.get(iconRes);
                 Log.d(TAG, "getDirection: DIRECTION DETECTED " + direction);
                 //get unit and distance from title
-                assert title != null;
-                Log.d(TAG, "title: " + title);
-                if (title.indexOf(" ") > 0) {
-                    String t = title.substring(0, title.indexOf(" ")).trim().toLowerCase();
-                    try {
-                        int distance = Integer.parseInt(t);
-                        String msg = direction + " in " + title;
-                        newData.append(msg).append("\n").append(text).append("\n\n");
-                        if (distance <= currentThreshold) {
-                            ForegroundService.this.sendNotification(context, msg, text, iconRes, icon);
-                            Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, e.toString());
-                        Log.e(TAG, Arrays.toString(e.getStackTrace()));
-                    }
-                } else {
-                    newData.append(title).append("\n").append(text).append("\n\n");
-                }
 
-                //TODO: use  DataUpdateListener?
-                context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("newData", newData.toString()));
+                String t = title.substring(0, title.indexOf(" ")).trim().toLowerCase();
+                try {
+                    int distance = Integer.parseInt(t);
+                    String msg = direction + " in " + title;
+                    newData.append(msg).append("\n").append(text).append("\n\n");
+                    if (distance <= currentThreshold) {
+                        ForegroundService.this.sendNotification(context, msg, text, iconRes, icon);
+                        Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.toString());
+                    Log.e(TAG, Arrays.toString(e.getStackTrace()));
+                }
+            } else {
+                newData.append(title).append("\n").append(text).append("\n\n");
             }
+
+            //TODO: use  DataUpdateListener?
+            context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("newData", newData.toString()));
         }
     }
-
 }

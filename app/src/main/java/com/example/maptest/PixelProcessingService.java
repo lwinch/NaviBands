@@ -109,12 +109,7 @@ public class PixelProcessingService {
             return intent.getIntExtra("icon", R.drawable.notification_icon);
         }
 
-        //terminate if icon is null
         Icon ic = intent.getParcelableExtra("icon", Icon.class);
-        if (ic == null) {
-            Log.d(TAG, "getDirection: Icon Null , Stopping work");
-            return -1;
-        }
 
         Log.d(TAG, "getDirection: Starting processing of BITMAP");
         //Perform operations and calculate processing time

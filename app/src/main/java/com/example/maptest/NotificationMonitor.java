@@ -64,7 +64,7 @@ public class NotificationMonitor extends NotificationListenerService {
                 String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
                 Icon icon = notification.getLargeIcon();
 
-                if (!notificationTitle.equals(title)) {
+                if (!notificationTitle.equals(title) && icon != null) {
                     notificationTitle = title;
                     //create an intent object for broadcasting
                     Intent msgrcv = createNotificationIntent(title, text, icon);
@@ -75,6 +75,8 @@ public class NotificationMonitor extends NotificationListenerService {
 
                     context.sendBroadcast(msgrcv);
                     Log.d(TAG, "onNotificationPosted: broadcast " + title);
+                } else if (icon == null) {
+                    Log.d(TAG, "onNotificationPosted: icon null for title" + title);
                 }
             }
 

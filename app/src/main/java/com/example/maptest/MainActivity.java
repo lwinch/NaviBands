@@ -232,14 +232,13 @@ public class MainActivity extends AppCompatActivity {
                 //Manifest.permission.ACCESS_COARSE_LOCATION,
                 //Manifest.permission.ACCESS_FINE_LOCATION,
                 //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.POST_NOTIFICATIONS,
                 //Manifest.permission.READ_EXTERNAL_STORAGE
         };
         //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
     }
 
     private void goToConnectActivity(boolean withResult) {
+        getBandConnectActivityPermissions();
         Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
         if(!withResult)startActivity(intent);
         else MainActivity.this.startActivity(intent.putExtra("requestCode", 69));
@@ -252,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getForegroundServicePermissions() {
         String[] permissions = {
-                Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
 //                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
@@ -268,6 +266,13 @@ public class MainActivity extends AppCompatActivity {
             //service is not enabled try to enabled by calling...
             startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
         }
+    }
+    private void getBandConnectActivityPermissions() {
+        String[] permissions = {
+                Manifest.permission.BLUETOOTH_CONNECT,
+        };
+        permissionsLauncher.launch(permissions);
+        //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
     }
 
     private void startForegroundService() {
