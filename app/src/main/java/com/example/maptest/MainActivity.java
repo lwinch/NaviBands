@@ -1,16 +1,9 @@
 package com.example.maptest;
 
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
-import static com.example.maptest.Constants.DIRECTION_KNOWN;
-import static com.example.maptest.Constants.DIRECTION_UNKNOWN;
-import static com.example.maptest.Constants.ICON_NULL;
-import static com.example.maptest.Constants.REROUTING;
+
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -32,14 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.math.MathUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -68,83 +64,19 @@ public class MainActivity extends AppCompatActivity {
 
     String[] vibrateModesArray;
 
-    NotificationManager notificationManager;
-    int notification_id = 0;
+    private final Map<String, Boolean> permissionStatus = new HashMap<>();
+
+    private ActivityResultLauncher<String[]> permissionsLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
 
     final BroadcastReceiver directionsReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive: Processed Intent Received");
-
-            String type = intent.getStringExtra("type");
-            if (REROUTING.equals(type)) {
-                Log.d(TAG, "onReceive: Intent is REROUTING");
-            } else if (ICON_NULL.equals(type)) {
-                Log.d(TAG, "onReceive: Intent is ICON_NULL");
-            } else {
-                String title = intent.getStringExtra("title");
-                String text = intent.getStringExtra("text");
-                int iconRes = intent.getIntExtra("iconRes", R.drawable.notification_icon);
-                String newData = title + "\n" + text + "\n";
-
-                if (DIRECTION_UNKNOWN.equals(type)) {
-                    Log.d(TAG, "onReceive: Intent is DIRECTION_UNKNOWN");
-                    newData += "\n";
-                    miband.vibrate(getPatternFromDirection(""));
-                } else if (DIRECTION_KNOWN.equals(type)) {
-                    Log.d(TAG, "onReceive: Intent is DIRECTION_KNOWN");
-                    String direction = intent.getStringExtra("direction");
-                    int distance = -1;
-                    String unit = "m";
-                    //get unit and distance from title
-                    assert title != null;
-                    Log.d(TAG, "title: " + title);
-                    if (title.indexOf(" ") > 0) {
-                        String t = title.substring(0, title.indexOf(" ")).trim().toLowerCase();
-                        //char[] c = t.toCharArray();
-                        //if(!(c[t.length() - 2] == 'k')){
-                        try {
-                            distance = Integer.parseInt(t);
-                        } catch (Exception e) {
-                            Log.e(TAG, e.toString());
-                            Log.e(TAG, Arrays.toString(e.getStackTrace()));
-                        }
-                        if (distance <= currentThreshold) {
-                            String msg = direction + " in " + title;
-                            updateMonitoringService(title, msg);
-                            //miband.vibrate(getPatternFromDirection(direction));
-                            this.sendNotification(msg, text, iconRes);
-                            Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
-                        } else {
-                            updateMonitoringService(title, "Navigating..");
-                        }
-                    }
-                    newData += direction + "\n\n";
-                }
-
-                //update UI
-                String oldData = logTv.getText().toString();
-                String logText = newData + oldData;
-                logTv.setText(logText);
-            }
-        }
-
-        private void sendNotification(String title, String text, int iconRes) {
-            Intent notificationIntent = new Intent(context, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-            Notification notification = new NotificationCompat.Builder(context, "navibands maps push")
-                    .setContentTitle(title)
-                    .setContentText("Navigating : " + text)
-                    .setSmallIcon(iconRes)
-                    .setContentIntent(pendingIntent)
-                    .setOnlyAlertOnce(true)
-                    .build();
-            // notificationId is a unique int for each notification that you must define.
-            notificationManager.cancelAll();
-            notificationManager.notify(notification_id, notification);
-            notification_id += 1;
-            Log.d(TAG, "notification sent");
+            //update UI
+            String oldData = logTv.getText().toString();
+            String logText = intent.getStringExtra("newData") + oldData;
+            logTv.setText(logText);
         }
     };
 
@@ -157,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
         init();
     }
 
-
     private void init() {
         findViews();
         initializeVariables();
@@ -165,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         getPermissions();
         setStatusTv();
         checkDeviceCompatibility();
-        createNotificationChannel();
     }
 
     //methods used by init
@@ -206,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         String thresholdText = currentThreshold + "m";
         thresholdTv.setText(thresholdText);
 
-        //For miband
+        //For MiBand
         miband = MiBand.getInstance(MainActivity.this);
 
         //vibrate mode speaker
@@ -242,14 +172,15 @@ public class MainActivity extends AppCompatActivity {
             setStatusTv();
             if (isChecked) {
                 //monitoring is on
-                startMonitoringService();
+                getForegroundServicePermissions();
+                startForegroundService();
                 registerReceiver();
                 miband.vibrate(CustomVibration.generatePattern("600",","));
                 NotificationMonitor.requestRebind(new ComponentName(this, NotificationMonitor.class));
             } else {
                 //monitoring is off
                 statusTv.setText(R.string.monitoring_off);
-                stopMonitoringService();
+                stopForegroundService();
                 unregisterReceiver();
                 NotificationMonitor.notificationMonitor.requestUnbind();
             }
@@ -297,15 +228,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPermissions() {
-        String[] permissions ={
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        String[] permissions = {
+                //Manifest.permission.ACCESS_COARSE_LOCATION,
+                //Manifest.permission.ACCESS_FINE_LOCATION,
+                //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.POST_NOTIFICATIONS,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                //Manifest.permission.READ_EXTERNAL_STORAGE
         };
-        ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
+        //permissionsLauncher.launch(permissions);
+        //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
 
         //Check for Notification access
 //        if (Settings.Secure.getString(this.getContentResolver(), "enabled_notification_listeners").contains(getApplicationContext().getPackageName())) {
@@ -314,33 +246,10 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            //TODO make sure this is up to date
 //            //service is not enabled try to enabled by calling...
-        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+        //startActivity(new Intent("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"));
 //        }
         //verifyBandAvailability();
     }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        CharSequence name = getString(R.string.channel_name);
-        String description = getString(R.string.channel_description);
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel channel = new NotificationChannel("navibands maps push", name, importance);
-        channel.setDescription(description);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this.
-        notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-    }
-
-//    private void verifyBandAvailability() {
-//        //if device is null, goto connect activity
-//        if (!miband.isPaired()) {
-//            goToConnectActivity(true);
-//        } else {
-//            Log.d(TAG, "verifyBandAvailability: " + miband.getDevice());
-//        }
-//    }
 
     private void goToConnectActivity(boolean withResult) {
         Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
@@ -353,25 +262,27 @@ public class MainActivity extends AppCompatActivity {
         return (int) Math.max(r * (Math.round((double) i / r)),0);
     }
 
-    private void startMonitoringService() {
+    private void getForegroundServicePermissions() {
+        String[] permissions = {
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
+                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+        };
+        permissionsLauncher.launch(permissions);
+        //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
+    }
+
+    private void startForegroundService() {
         Intent intent = new Intent(context, ForegroundService.class);
         intent.putExtra("title", "NaviBands");
         intent.putExtra("text", "Navigation Mode ON");
+        intent.putExtra("currentThreshold", currentThreshold);
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startMonitoringService: " + R.string.monitoring_on);
     }
 
-    private void updateMonitoringService(String title, String text) {
-        Intent intent = new Intent(context, ForegroundService.class);
-        intent.putExtra("title", title);
-        intent.putExtra("text", text);
-        ContextCompat.startForegroundService(context, intent);
-        Log.d(TAG, "updateMonitoringService: onStartCommand >> " + title + " | " + text);
-        Log.d(TAG, "startMonitoringService: " + R.string.monitoring_on);
-    }
-
-
-    private void stopMonitoringService() {
+    private void stopForegroundService() {
         stopService(new Intent(context, ForegroundService.class));
         statusTv.setText(R.string.monitoring_off);
         Log.d(TAG, "stopMonitoringService: " + R.string.monitoring_off);

@@ -65,17 +65,17 @@ public class NotificationMonitor extends NotificationListenerService {
                 CharSequence textCS = extras.getCharSequence("android.text");
                 String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
                 Icon icon = notification.getLargeIcon();
-                String type = REROUTING.equals(title) ? REROUTING : title;
+                //String type = REROUTING.equals(title) ? REROUTING : title;
 
                 if (!notificationTitle.equals(title)) {
                     notificationTitle = title;
                     //create an intent object for broadcasting
-                    Intent msgrcv = createNotificationIntent(type, title, text, icon);
+                    Intent msgrcv = createNotificationIntent(title, text, icon);
 
                     //broadcast notification intent
                     Log.d(TAG, "onNotificationPosted: title : " + title);
                     Log.d(TAG, "onNotificationPosted: text : " + text);
-                    Log.d(TAG, "onNotificationPosted: type : " + type);
+//                    Log.d(TAG, "onNotificationPosted: type : " + type);
 
 //                    LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
                     context.sendBroadcast(msgrcv);
@@ -87,16 +87,17 @@ public class NotificationMonitor extends NotificationListenerService {
         }
     }
 
-    Intent createNotificationIntent(String type, String title, String text, Icon icon) {
+    Intent createNotificationIntent(String title, String text, Icon icon) {
         Intent intent = new Intent(NOTIFICATION_RECEIVED)
-                .putExtra("type", type)
+                //.putExtra("type", type)
                 .putExtra("title", title)
-                .putExtra("text", text);
-        if (!REROUTING.equals(type)) {
-            intent.putExtra("icon", icon);
-        } else {
-            Log.d(TAG, "createNotificationIntent: Icon NULL");
-        }
+                .putExtra("text", text)
+                .putExtra("icon", icon);
+//        if (!REROUTING.equals(title)) {
+//            intent.putExtra("icon", icon);
+//        } else {
+//            Log.d(TAG, "createNotificationIntent: Icon NULL");
+//        }
         return intent;
     }
 }

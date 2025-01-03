@@ -1,8 +1,5 @@
 package com.example.maptest;
 
-import static com.example.maptest.Constants.DIRECTION_BROADCAST;
-import static com.example.maptest.Constants.DIRECTION_KNOWN;
-import static com.example.maptest.Constants.ICON_NULL;
 import static com.example.maptest.Constants.REROUTING;
 
 import android.content.Context;
@@ -104,30 +101,24 @@ public class PixelProcessingService {
 
 
     //get Direction from icons
-    protected static void getDirection(Context context, @NonNull Intent intent) {
+    protected static int getDirection(Context context, @NonNull Intent intent) {
 
         Log.d(TAG, "getDirection: Inside PixelProcessingService");
         //return if Map is rerouting
-        if (REROUTING.equals(intent.getStringExtra("type"))) {
-            context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", REROUTING));
-            return;
+        if (REROUTING.equals(intent.getStringExtra("title"))) {
+            return intent.getIntExtra("icon", R.drawable.notification_icon);
         }
 
         //terminate if icon is null
         Icon ic = intent.getParcelableExtra("icon", Icon.class);
         if (ic == null) {
             Log.d(TAG, "getDirection: Icon Null , Stopping work");
-            context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("type", ICON_NULL));
-            return;
+            return -1;
         }
 
         Log.d(TAG, "getDirection: Starting processing of BITMAP");
         //Perform operations and calculate processing time
         long start_time = System.nanoTime();
-
-        //extract text elements
-        String title = intent.getStringExtra("title");
-        String text = intent.getStringExtra("text");
 
         //convert icon to bitmap
         Drawable d = ic.loadDrawable(context);
@@ -135,27 +126,14 @@ public class PixelProcessingService {
         //get bitmap and get direction
         Bitmap currentBitmap = getComparableBitmap(d);
         int matchingRes = IconDataset.getMatchingIcon(currentBitmap);
-        String direction = IconDataset.directionNames.get(matchingRes);
 //        String filename = storeImage(currentBitmap,context);
 //        Log.d(TAG, "Stored >> "+title+" | "+text+" | "+direction + " | "+filename);
 
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
-
-        Log.d(TAG, "getDirection: DIRECTION DETECTED " + direction);
         Log.d(TAG, "getDirection: Processing time " + difference);
 
-        //broadcast job done intent
-        Intent jobDoneIntent = new Intent(DIRECTION_BROADCAST);
-        jobDoneIntent.putExtra("type", DIRECTION_KNOWN);
-        jobDoneIntent.putExtra("direction", direction);
-        jobDoneIntent.putExtra("title", title);
-        jobDoneIntent.putExtra("text", text);
-        jobDoneIntent.putExtra("iconRes", matchingRes);
-
-        //broadcast the intent
-        context.sendBroadcast(jobDoneIntent);
-        Log.d(TAG, "getDirection: intent broadcast");
+        return matchingRes;
     }
 
 
