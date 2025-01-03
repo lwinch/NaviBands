@@ -2,7 +2,6 @@ package com.example.maptest;
 
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
 
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -14,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final Map<String, Boolean> permissionStatus = new HashMap<>();
 
-    private ActivityResultLauncher<String[]> permissionsLauncher = registerForActivityResult(
+    private final ActivityResultLauncher<String[]> permissionsLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
 
     final BroadcastReceiver directionsReceiver = new BroadcastReceiver() {
@@ -236,19 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.POST_NOTIFICATIONS,
                 //Manifest.permission.READ_EXTERNAL_STORAGE
         };
-        //permissionsLauncher.launch(permissions);
         //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
-
-        //Check for Notification access
-//        if (Settings.Secure.getString(this.getContentResolver(), "enabled_notification_listeners").contains(getApplicationContext().getPackageName())) {
-//            //service is enabled do something
-//            Log.d(TAG, "Notification access already enabled");
-//        } else {
-//            //TODO make sure this is up to date
-//            //service is not enabled try to enabled by calling...
-        //startActivity(new Intent("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"));
-//        }
-        //verifyBandAvailability();
     }
 
     private void goToConnectActivity(boolean withResult) {
@@ -267,10 +255,19 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
-                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+//                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
         };
         permissionsLauncher.launch(permissions);
         //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
+        //Check for Notification access
+        //Cannot request this permission using a dialog because only system apps can request this permission
+        if (Settings.Secure.getString(this.getContentResolver(), "enabled_notification_listeners").contains(getApplicationContext().getPackageName())) {
+            //service is enabled do something
+            Log.d(TAG, "Notification access already enabled");
+        } else {
+            //service is not enabled try to enabled by calling...
+            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+        }
     }
 
     private void startForegroundService() {

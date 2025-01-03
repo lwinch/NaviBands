@@ -2,7 +2,6 @@ package com.example.maptest;
 
 import static com.example.maptest.Constants.MAPS_PACKAGE;
 import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
-import static com.example.maptest.Constants.REROUTING;
 
 import android.app.Notification;
 import android.content.Context;
@@ -20,7 +19,6 @@ import java.util.HashSet;
 public class NotificationMonitor extends NotificationListenerService {
 
     private static final String TAG = "NotificationMonitor";
-    //static Drawable currIcon = null;
     Context context;
     String notificationTitle = "";//title of previous notification
     HashSet<String> titleSet;
@@ -65,7 +63,6 @@ public class NotificationMonitor extends NotificationListenerService {
                 CharSequence textCS = extras.getCharSequence("android.text");
                 String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
                 Icon icon = notification.getLargeIcon();
-                //String type = REROUTING.equals(title) ? REROUTING : title;
 
                 if (!notificationTitle.equals(title)) {
                     notificationTitle = title;
@@ -75,9 +72,7 @@ public class NotificationMonitor extends NotificationListenerService {
                     //broadcast notification intent
                     Log.d(TAG, "onNotificationPosted: title : " + title);
                     Log.d(TAG, "onNotificationPosted: text : " + text);
-//                    Log.d(TAG, "onNotificationPosted: type : " + type);
 
-//                    LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
                     context.sendBroadcast(msgrcv);
                     Log.d(TAG, "onNotificationPosted: broadcast " + title);
                 }
@@ -88,16 +83,9 @@ public class NotificationMonitor extends NotificationListenerService {
     }
 
     Intent createNotificationIntent(String title, String text, Icon icon) {
-        Intent intent = new Intent(NOTIFICATION_RECEIVED)
-                //.putExtra("type", type)
+        return new Intent(NOTIFICATION_RECEIVED)
                 .putExtra("title", title)
                 .putExtra("text", text)
                 .putExtra("icon", icon);
-//        if (!REROUTING.equals(title)) {
-//            intent.putExtra("icon", icon);
-//        } else {
-//            Log.d(TAG, "createNotificationIntent: Icon NULL");
-//        }
-        return intent;
     }
 }
