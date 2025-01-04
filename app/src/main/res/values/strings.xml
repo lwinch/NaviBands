@@ -31,5 +31,9 @@
     <string name="channel_description">notification channel for navigation push</string>
     <string name="connecting">Connecting…</string>
     <string name="disconnecting">Disconnecting…</string>
+    <string name="notification_listener_service">"Notification Listener Service"</string>
+    <string name="notification_listener_service_explanation">"For the app to work, you need to enable the Notification Listener Service. Enable it now?"</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

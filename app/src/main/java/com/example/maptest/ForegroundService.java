@@ -1,7 +1,7 @@
 package com.example.maptest;
 
+import static com.example.maptest.App.FOREGROUND_CHANNEL_ID;
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
-import static com.example.maptest.Constants.DIRECTION_UNKNOWN;
 import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
 import static com.example.maptest.Constants.REROUTING;
 
@@ -25,6 +25,8 @@ import androidx.core.app.NotificationCompat;
 
 import java.util.Arrays;
 
+import jashgopani.github.io.mibandsdk.MiBand;
+
 /*
  * This class is for showing notifications while service is running
  * */
@@ -38,13 +40,7 @@ public class ForegroundService extends Service {
     final String CHANNEL_ID = "naviBands maps push";
     private int currentThreshold;
     int notification_id = 0;
-
-    BroadcastReceiver test = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive: Test received Notification");
-        }
-    };
+    MiBand miBand;
 
     @Override
     public void onCreate() {
@@ -53,8 +49,8 @@ public class ForegroundService extends Service {
         notificationReceiver = new NotificationReceiver();
         IntentFilter notificationIntentFilter = new IntentFilter(NOTIFICATION_RECEIVED);
         context.registerReceiver(notificationReceiver, notificationIntentFilter, Context.RECEIVER_EXPORTED);
-        context.registerReceiver(test, notificationIntentFilter, Context.RECEIVER_NOT_EXPORTED);
         createNotificationChannel();
+        miBand = MiBand.getInstance(ForegroundService.this);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class ForegroundService extends Service {
         stopForeground(flags);
         currentThreshold = intent.getIntExtra("currentThreshold", 5);
         Notification notification = getForegroundNotification(this, title, text);
-        startForeground(69, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        startForeground(420, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
         return START_STICKY;
     }
 
@@ -74,7 +70,7 @@ public class ForegroundService extends Service {
         Intent notificationIntent = new Intent(context, ForegroundService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
+        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(text + "\nDistance threshold: " + currentThreshold)
                 .setSmallIcon(R.drawable.notification_icon)
@@ -87,7 +83,6 @@ public class ForegroundService extends Service {
     public void onDestroy() {
         Log.d(TAG, "onDestroy: Destroying Foreground service");
         context.unregisterReceiver(notificationReceiver);
-        context.unregisterReceiver(test);
         super.onDestroy();
     }
 
@@ -99,15 +94,11 @@ public class ForegroundService extends Service {
     }
 
     private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
         CharSequence name = getString(R.string.channel_name);
         String description = getString(R.string.channel_description);
         int importance = NotificationManager.IMPORTANCE_HIGH;
         notificationChannel = new NotificationChannel(CHANNEL_ID, name, importance);
         notificationChannel.setDescription(description);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this.
         notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(notificationChannel);
     }

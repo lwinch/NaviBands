@@ -5,6 +5,7 @@ public class Constants {
     public static final String PACKAGE = "com.example.maptest";
     public static final String MAPS_PACKAGE = "com.google.android.apps.maps";
     public static final String NOTIFICATION_RECEIVED = "originNotificationListenerService";
+    public static final String NOTIFICATION_MONITOR_UNBIND = "notificationMonitorUnbind";
     public static final String JOB_DONE = "originPixelProcessingService";
     public static final String ENCODED_DATA = "compressedPixelString";
     public static final String DIRECTION = "directionName";

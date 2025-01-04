@@ -1,16 +1,15 @@
 package com.example.maptest;
 
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
+import static com.example.maptest.Constants.NOTIFICATION_MONITOR_UNBIND;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -29,7 +28,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.math.MathUtils;
 
@@ -64,11 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
     String[] vibrateModesArray;
 
-    private final Map<String, Boolean> permissionStatus = new HashMap<>();
+    private Map<String, Boolean> permissionStatus;
 
-    private final ActivityResultLauncher<String[]> permissionsLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
-
+    private ActivityResultLauncher<String[]> permissionsLauncher;
     final BroadcastReceiver directionsReceiver = new BroadcastReceiver() {
 
         @Override
@@ -86,45 +82,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: called");
-        init();
-    }
-
-    private void init() {
         findViews();
         initializeVariables();
         addEventListeners();
-        getPermissions();
         setStatusTv();
-        checkDeviceCompatibility();
     }
 
-    //methods used by init
-    private void checkDeviceCompatibility() {
-        //get The bluetooth adapter
-        BluetoothAdapter bluetoothAdapter;
-        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        bluetoothAdapter = bluetoothManager.getAdapter();
-
-        // Use this check to determine whether BLE is supported on the device. Then
-        // you can selectively disable BLE-related features.
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        //check bluetooth enabled or not
-        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-            }
-            MainActivity.this.startActivity(enableBtIntent);
-        }
+    //methods used by onCreate
+    private void findViews() {
+        toggleMonitoringBtn = findViewById(R.id.toggleMonitoringBtn);
+        logTv = findViewById(R.id.logtv);
+        statusTv = findViewById(R.id.statustv);
+        thresholdSb = findViewById(R.id.thresholdSeek);
+        thresholdTv = findViewById(R.id.thresholdTv);
+        gotoConnectBtn = findViewById(R.id.gotoConnectBtn);
+        bandMacTv = findViewById(R.id.bandMacTv);
+        bandConnectionStatusTv = findViewById(R.id.bandConnectedStatusTv);
+        bandBatteryStatusTv = findViewById(R.id.bandBatteryStatusTv);
+        bandChargingStatusTv = findViewById(R.id.bandChargingStatusTv);
+        vibrateSpinner = findViewById(R.id.vibrateOnlySpinner);
     }
 
     private void initializeVariables() {
@@ -149,25 +125,15 @@ public class MainActivity extends AppCompatActivity {
         vibrateOnlyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, vibrateModesArray);
         vibrateOnlyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         vibrateSpinner.setAdapter(vibrateOnlyAdapter);
-    }
 
-    private void findViews() {
-        toggleMonitoringBtn = findViewById(R.id.toggleMonitoringBtn);
-        logTv = findViewById(R.id.logtv);
-        statusTv = findViewById(R.id.statustv);
-        thresholdSb = findViewById(R.id.thresholdSeek);
-        thresholdTv = findViewById(R.id.thresholdTv);
-        gotoConnectBtn = findViewById(R.id.gotoConnectBtn);
-        bandMacTv = findViewById(R.id.bandMacTv);
-        bandConnectionStatusTv = findViewById(R.id.bandConnectedStatusTv);
-        bandBatteryStatusTv = findViewById(R.id.bandBatteryStatusTv);
-        bandChargingStatusTv = findViewById(R.id.bandChargingStatusTv);
-        vibrateSpinner = findViewById(R.id.vibrateOnlySpinner);
+        permissionStatus = new HashMap<>();
+        permissionsLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
     }
 
     private void addEventListeners() {
         toggleMonitoringBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Log.d(TAG, "onCheckedChanged: Monitor");
+            Log.d(TAG, "onCheckedChanged: " + isChecked);
             monitoringMode = isChecked;
             setStatusTv();
             if (isChecked) {
@@ -179,10 +145,9 @@ public class MainActivity extends AppCompatActivity {
                 NotificationMonitor.requestRebind(new ComponentName(this, NotificationMonitor.class));
             } else {
                 //monitoring is off
-                statusTv.setText(R.string.monitoring_off);
                 stopForegroundService();
                 unregisterReceiver();
-                NotificationMonitor.notificationMonitor.requestUnbind();
+                context.sendBroadcast(new Intent(NOTIFICATION_MONITOR_UNBIND).putExtra("action", "unbind"));
             }
         });
 
@@ -196,6 +161,11 @@ public class MainActivity extends AppCompatActivity {
                 thresholdTv.setTextColor(Color.RED);
             }
 
+            private int roundTo(int i, int r) {
+                r = Math.max(1, r);
+                return (int) Math.max(r * (Math.round((double) i / r)),0);
+            }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
@@ -205,13 +175,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        gotoConnectBtn.setOnClickListener(v-> goToConnectActivity(false));
+        gotoConnectBtn.setOnClickListener(v-> {
+            Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
+            //startActivity(intent);
+            MainActivity.this.startActivity(intent.putExtra("requestCode", 69));
+        });
 
         vibrateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedVibrationMode = position;
-                Toast.makeText(MainActivity.this, "Band will vibrate for "+vibrateModesArray[position], Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                        MainActivity.this,
+                        "Band will vibrate for " + vibrateModesArray[position],
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -220,35 +197,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onNothingSelected: Done nothing");
             }
         });
-
     }
 
     private void setStatusTv() {
         statusTv.setText(monitoringMode ? R.string.monitoring_on : R.string.monitoring_off);
     }
 
-    private void getPermissions() {
-        String[] permissions = {
-                //Manifest.permission.ACCESS_COARSE_LOCATION,
-                //Manifest.permission.ACCESS_FINE_LOCATION,
-                //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                //Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-        //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
-    }
-
-    private void goToConnectActivity(boolean withResult) {
-        getBandConnectActivityPermissions();
-        Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
-        if(!withResult)startActivity(intent);
-        else MainActivity.this.startActivity(intent.putExtra("requestCode", 69));
-    }
-
-    private int roundTo(int i, int r) {
-        r = Math.max(1, r);
-        return (int) Math.max(r * (Math.round((double) i / r)),0);
-    }
-
+    //methods used by event Listeners
     private void getForegroundServicePermissions() {
         String[] permissions = {
                 Manifest.permission.POST_NOTIFICATIONS,
@@ -264,15 +219,23 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Notification access already enabled");
         } else {
             //service is not enabled try to enabled by calling...
-            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+            AlertDialog.Builder alertDialogBuilder = getAlertDialogBuilder();
+            alertDialogBuilder.create().show();
         }
     }
-    private void getBandConnectActivityPermissions() {
-        String[] permissions = {
-                Manifest.permission.BLUETOOTH_CONNECT,
-        };
-        permissionsLauncher.launch(permissions);
-        //ActivityCompat.requestPermissions(MainActivity.this, permissions, 0);
+
+    private AlertDialog.Builder getAlertDialogBuilder() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.notification_listener_service);
+        alertDialogBuilder.setMessage(R.string.notification_listener_service_explanation);
+        alertDialogBuilder.setPositiveButton(R.string.yes, (dialog, id) ->
+                startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")));
+        alertDialogBuilder.setNegativeButton(R.string.no,
+                (dialog, id) -> {
+                    // If you choose to not enable the notification listener
+                    // the app. will not work as expected
+                });
+        return alertDialogBuilder;
     }
 
     private void startForegroundService() {
@@ -281,13 +244,12 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("text", "Navigation Mode ON");
         intent.putExtra("currentThreshold", currentThreshold);
         ContextCompat.startForegroundService(context, intent);
-        Log.d(TAG, "startMonitoringService: " + R.string.monitoring_on);
+        Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);
     }
 
     private void stopForegroundService() {
         stopService(new Intent(context, ForegroundService.class));
-        statusTv.setText(R.string.monitoring_off);
-        Log.d(TAG, "stopMonitoringService: " + R.string.monitoring_off);
+        Log.d(TAG, "stopForegroundService: " + R.string.monitoring_off);
     }
 
     private void registerReceiver() {
@@ -298,36 +260,6 @@ public class MainActivity extends AppCompatActivity {
     private void unregisterReceiver() {
         context.unregisterReceiver(directionsReceiver);
         Log.d(TAG, "unregisterReceiver: DIRECTION_BROADCAST unregistered");
-    }
-
-    private Integer[] getPatternFromDirection(String d) {
-        Integer[] noVibration = new Integer[]{};
-        if(Directions.isUTurn(d)) return CustomVibration.generatePattern(300,100,4);
-        else if(Directions.isLeft(d)) return (selectedVibrationMode!=2)?CustomVibration.LEFT_PULSE:noVibration;
-        else if(Directions.isRight(d)) return (selectedVibrationMode!=1)?CustomVibration.RIGHT_PULSE:noVibration;
-        else switch (d) {
-                case Directions.STRAIGHT:
-                    return noVibration;
-                case Directions.ALTERNATE:
-                    return CustomVibration.FROWN;
-                default:
-                    return CustomVibration.generatePattern("600",",");
-            }
-    }
-    private void updateBandStats(){
-        boolean paired = miband.isPaired();
-        if (paired){
-            bandMacTv.setText(miband.getDevice().toString());
-            bandConnectionStatusTv.setText(MiBand.getStatus(MiBand.PAIRED));
-            bandMacTv.setTextColor(Color.GREEN);
-            bandBatteryStatusTv.setText(currentBattery==-1?"---":String.valueOf(currentBattery));
-            bandChargingStatusTv.setText(chargingStatus==null?"---": chargingStatus);
-        } else {
-            bandConnectionStatusTv.setText(MiBand.getStatus(MiBand.DISCONNECTED));
-            bandMacTv.setTextColor(Color.RED);
-            bandBatteryStatusTv.setText("---");
-            bandChargingStatusTv.setText("---");
-        }
     }
 
     /**
@@ -349,6 +281,22 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, err.toString());
                         Log.e(TAG, Arrays.toString(err.getStackTrace()));
                     }, () -> Log.d(TAG, "getBatteryInfo: onComplete"));
+        }
+    }
+
+    private void updateBandStats(){
+        boolean paired = miband.isPaired();
+        if (paired){
+            bandMacTv.setText(miband.getDevice().toString());
+            bandConnectionStatusTv.setText(MiBand.getStatus(MiBand.PAIRED));
+            bandMacTv.setTextColor(Color.GREEN);
+            bandBatteryStatusTv.setText(currentBattery==-1?"---":String.valueOf(currentBattery));
+            bandChargingStatusTv.setText(chargingStatus==null?"---": chargingStatus);
+        } else {
+            bandConnectionStatusTv.setText(MiBand.getStatus(MiBand.DISCONNECTED));
+            bandMacTv.setTextColor(Color.RED);
+            bandBatteryStatusTv.setText("---");
+            bandChargingStatusTv.setText("---");
         }
     }
 
@@ -381,6 +329,21 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, e.toString());
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
         }
+    }
+
+    private Integer[] getPatternFromDirection(String d) {
+        Integer[] noVibration = new Integer[]{};
+        if(Directions.isUTurn(d)) return CustomVibration.generatePattern(300,100,4);
+        else if(Directions.isLeft(d)) return (selectedVibrationMode!=2)?CustomVibration.LEFT_PULSE:noVibration;
+        else if(Directions.isRight(d)) return (selectedVibrationMode!=1)?CustomVibration.RIGHT_PULSE:noVibration;
+        else switch (d) {
+                case Directions.STRAIGHT:
+                    return noVibration;
+                case Directions.ALTERNATE:
+                    return CustomVibration.FROWN;
+                default:
+                    return CustomVibration.generatePattern("600",",");
+            }
     }
 
     @Override

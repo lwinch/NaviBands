@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +26,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -49,67 +53,28 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
     private RecyclerView scanRv;
     private ScanResultsAdapter scanResultsAdapter;
     private BluetoothDevice currentDevice;
-    private boolean connected,paired;
+    private boolean connected, paired;
     private MiBand miBand;
     int requestCode;
     CompositeDisposable disposables;
+    private Map<String, Boolean> permissionStatus;
+
+    private ActivityResultLauncher<String[]> permissionsLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_band_connect);
         Log.d(TAG, "onCreate: BandConnectActivity + "+MiBand.getInstance(BandConnectActivity.this).getDevice());
-        init();
-    }
-
-    private void init() {
         initializeClassFields();
         findViews();
         configureViews();
         setEventListeners();
         checkDeviceCompatibility();
-        getPermissions();
         updateUIControls();
     }
 
-    private void getPermissions() {
-        String[] permissions ={
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.BLUETOOTH_CONNECT,
-
-        };
-        ActivityCompat.requestPermissions(BandConnectActivity.this, permissions, 0);
-
-    }
-
-    //methods used by init
-    private void checkDeviceCompatibility() {
-        // Use this check to determine whether BLE is supported on the device. Then
-        // you can selectively disable BLE-related features.
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        //check bluetooth enabled or not
-        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent =
-                    new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-            }
-            BandConnectActivity.this.startActivity(enableBtIntent);
-        }
-    }
-
+    //methods used by onCreate
     private void initializeClassFields() {
         requestCode = getIntent().getIntExtra("requestCode", -1);
         addressHashSet = new HashSet<>();
@@ -134,6 +99,9 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
                     .subscribe(handleConnectionNext(), handleConnectionError(),handleConnectionComplete()));
         }
         setResult(App.DEVICE_NULL);
+        permissionStatus = new HashMap<>();
+        permissionsLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
     }
 
     private void findViews() {
@@ -148,7 +116,6 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         scanRv.setAdapter(scanResultsAdapter);
         scanRv.setLayoutManager(new LinearLayoutManager(context));
     }
-
 
     private void setEventListeners() {
         //scans nearby BLE devices and stops scanning in SCAN_PERIOD time
@@ -188,12 +155,47 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
 
     }
 
+    private void checkDeviceCompatibility() {
+        // Use this check to determine whether BLE is supported on the device. Then
+        // you can selectively disable BLE-related features.
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        String[] permissions = {
+                //Manifest.permission.ACCESS_COARSE_LOCATION,
+                //Manifest.permission.ACCESS_FINE_LOCATION,
+                //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.BLUETOOTH_CONNECT,
+        };
+        permissionsLauncher.launch(permissions);
+
+        //check bluetooth enabled or not
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+                //ActivityCompat.requestPermissions(BandConnectActivity.this, permissions, 0);
+                // TODO: Consider calling ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                BandConnectActivity.this.startActivity(enableBtIntent);
+            } else {
+                finish();
+            }
+        }
+
+    }
+
+    // methods used by event listeners
     private void resetAdapterData() {
         addressHashSet.clear();
         deviceArrayList.clear();
         scanResultsAdapter.updateList(deviceArrayList);
     }
-
 
     private void connectAndPair() {
         toast("Connecting...");
@@ -295,7 +297,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
         return (Consumer<Throwable>) throwable -> {
             Log.d(TAG, "Scanning Error Received: \n");
             if (throwable != null) {
-                Log.d(TAG, throwable.getMessage());
+                Log.d(TAG, throwable.getMessage() == null ? "NULL MESSAGE" : throwable.getMessage());
                 Log.d(TAG, Arrays.toString(throwable.getStackTrace()));
             }
         };
