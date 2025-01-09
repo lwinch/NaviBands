@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -50,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
     TextView bandConnectionStatusTv, bandBatteryStatusTv, bandChargingStatusTv;
     Button gotoConnectBtn;
     SeekBar thresholdSb;
-    private int currentThreshold = 5;
+//    private LiveData<Double> currentThreshold;
     boolean monitoringMode;
     MiBand miband;
-    int currentBattery = -1,selectedVibrationMode = 0;
+    int currentBattery = -1, selectedVibrationMode = 0;
     String chargingStatus;
     Spinner vibrateSpinner;
     ArrayAdapter<String> vibrateOnlyAdapter;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Boolean> permissionStatus;
 
     private ActivityResultLauncher<String[]> permissionsLauncher;
+
+    private SettingsDataStore settingsDataStore;
     final BroadcastReceiver directionsReceiver = new BroadcastReceiver() {
 
         @Override
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: called");
+        settingsDataStore = SettingsDataStore.getInstance(this);
+//        this.currentThreshold = settingsDataStore.distThresholdFlow;
         findViews();
         initializeVariables();
         addEventListeners();
@@ -108,8 +113,9 @@ public class MainActivity extends AppCompatActivity {
         monitoringMode = false;
 
         //seek bar and its related text view
-        thresholdSb.setProgress(currentThreshold);
-        String thresholdText = currentThreshold + "m";
+        thresholdSb.setProgress(settingsDataStore.getDistanceThreshold());
+        String thresholdText = settingsDataStore.getDistanceThreshold()
+                + getString(R.string.first_distance_unit);
         thresholdTv.setText(thresholdText);
 
         //For MiBand
@@ -154,9 +160,11 @@ public class MainActivity extends AppCompatActivity {
         thresholdSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progress = MathUtils.clamp(progress, 5, 100);
-                currentThreshold = roundTo(progress,5);
-                String thresholdText = currentThreshold + "m";
+                Resources res = getResources();
+                progress = MathUtils.clamp(progress, res.getInteger(R.integer.first_unit_min), res.getInteger(R.integer.first_unit_max));
+                int currentThreshold = roundTo(progress, res.getInteger(R.integer.first_unit_interval));
+                settingsDataStore.updateDistanceThreshold(currentThreshold);
+                String thresholdText = currentThreshold + getString(R.string.first_distance_unit);
                 thresholdTv.setText(thresholdText);
                 thresholdTv.setTextColor(Color.RED);
             }
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(context, ForegroundService.class);
         intent.putExtra("title", "NaviBands");
         intent.putExtra("text", "Navigation Mode ON");
-        intent.putExtra("currentThreshold", currentThreshold);
+        intent.putExtra("currentThreshold", settingsDataStore.getDistanceThreshold());
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);
     }
@@ -266,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
      * Retrieve Battery Info and update UI
      */
     private void refreshBatteryInfo(boolean onlyOnce){
-        Log.d(TAG, "refreshBatteryInfo: "+miband.isPaired());
+        Log.d(TAG, "refreshBatteryInfo: " + miband.isPaired());
         if(miband.isPaired()) {
             batteryDisposable = miband.getBatteryInfo(5, TimeUnit.MINUTES, onlyOnce)
                     .subscribeOn(Schedulers.io())
@@ -334,8 +342,8 @@ public class MainActivity extends AppCompatActivity {
     private Integer[] getPatternFromDirection(String d) {
         Integer[] noVibration = new Integer[]{};
         if(Directions.isUTurn(d)) return CustomVibration.generatePattern(300,100,4);
-        else if(Directions.isLeft(d)) return (selectedVibrationMode!=2)?CustomVibration.LEFT_PULSE:noVibration;
-        else if(Directions.isRight(d)) return (selectedVibrationMode!=1)?CustomVibration.RIGHT_PULSE:noVibration;
+        else if (Directions.isLeft(d)) return (selectedVibrationMode != 2) ? CustomVibration.LEFT_PULSE:noVibration;
+        else if (Directions.isRight(d)) return (selectedVibrationMode != 1) ? CustomVibration.RIGHT_PULSE:noVibration;
         else switch (d) {
                 case Directions.STRAIGHT:
                     return noVibration;

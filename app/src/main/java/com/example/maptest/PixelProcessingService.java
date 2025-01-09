@@ -1,20 +1,16 @@
 package com.example.maptest;
 
-import static com.example.maptest.Constants.REROUTING;
-
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Environment;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,38 +27,21 @@ public class PixelProcessingService {
     //get alpha pixels of Bitmap as a list
     public static ArrayList<Integer> getAlphaPixels(Bitmap a) {
         ArrayList<Integer> pixels = new ArrayList<>();
-        for (int i = 0; i < a.getWidth(); i++)
-            for (int j = 0; j < a.getHeight(); j++)
+        for (int i = 0; i < a.getWidth(); i++) {
+            for (int j = 0; j < a.getHeight(); j++) {
                 pixels.add(Color.alpha(a.getPixel(i, j)));
-
+            }
+        }
         return pixels;
     }
 
     //get an alpha bitmap from a resource of size 100x100
     public static Bitmap getComparableBitmap(Context appContext, int resId) {
-        //for storing result
-        Bitmap bitmap;
-
         //get drawable from resource id
-        Drawable drawable = appContext.getDrawable(resId);
+        Drawable drawable = AppCompatResources.getDrawable(appContext, resId);
         assert drawable != null;
         drawable = drawable.mutate();
-
-        try {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                    drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        } catch (ClassCastException e) {
-            VectorDrawable vd = (VectorDrawable) drawable;
-            bitmap = Bitmap.createBitmap(vd.getIntrinsicWidth(),
-                    vd.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
-
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        //return alpha bitmap of size 100x100
-        return scaleBitmap(bitmap.extractAlpha(), bitmap.getWidth(), bitmap.getHeight(), 100f, 100f);
+        return getComparableBitmap(drawable);
     }
 
     //get an alpha bitmap from a resource of size 100x100
@@ -99,38 +78,25 @@ public class PixelProcessingService {
         return Bitmap.createBitmap(cbOriginal, 0, 0, width, height, matrix, true);
     }
 
-
     //get Direction from icons
-    protected static int getDirection(Context context, @NonNull Intent intent) {
-
+    protected static int getDirection(Drawable drawable) {
         Log.d(TAG, "getDirection: Inside PixelProcessingService");
-        //return if Map is rerouting
-        if (REROUTING.equals(intent.getStringExtra("title"))) {
-            return intent.getIntExtra("icon", R.drawable.notification_icon);
-        }
-
-        Icon ic = intent.getParcelableExtra("icon", Icon.class);
-
         Log.d(TAG, "getDirection: Starting processing of BITMAP");
         //Perform operations and calculate processing time
         long start_time = System.nanoTime();
 
         //convert icon to bitmap
-        Drawable d = ic.loadDrawable(context);
-
-        //get bitmap and get direction
-        Bitmap currentBitmap = getComparableBitmap(d);
+        Bitmap currentBitmap = getComparableBitmap(drawable);
         int matchingRes = IconDataset.getMatchingIcon(currentBitmap);
 //        String filename = storeImage(currentBitmap,context);
 //        Log.d(TAG, "Stored >> "+title+" | "+text+" | "+direction + " | "+filename);
 
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
-        Log.d(TAG, "getDirection: Processing time " + difference);
+        Log.d(TAG, "getDirection: Processing time: " + difference + " ");
 
         return matchingRes;
     }
-
 
     //Create a File for saving an image or video
     private static File getOutputMediaFile(Context context) {
@@ -187,6 +153,4 @@ public class PixelProcessingService {
 
         return pictureFile.getPath();
     }
-
-
 }

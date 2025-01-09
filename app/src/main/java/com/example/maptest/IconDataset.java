@@ -17,13 +17,19 @@ public class IconDataset {
     protected static HashMap<Integer, ArrayList<Integer>> bitmapData = null;
     protected static HashMap<Integer, String> directionNames = null;
 
-    private static void loadBitmapData(){
-        if(datasetResources==null) loadDatasetResources();
+    static {
+        loadDatasetResources();
+        mapDirectionsWithResources();
+        loadBitmapData();
+    }
+
+    private static void loadBitmapData() {
+        //if (datasetResources == null) loadDatasetResources();
         bitmapData = new HashMap<>();
-        for(int res:datasetResources){
-            Bitmap bitmap = PixelProcessingService.getComparableBitmap(App.context,res);
+        for (int res : datasetResources) {
+            Bitmap bitmap = PixelProcessingService.getComparableBitmap(App.context, res);
             ArrayList<Integer> alphaPixels = PixelProcessingService.getAlphaPixels(bitmap);
-            bitmapData.put(res,alphaPixels);
+            bitmapData.put(res, alphaPixels);
         }
     }
     private static void loadDatasetResources() {
@@ -82,7 +88,7 @@ public class IconDataset {
             };
         }
 
-        mapDirectionsWithResources();
+        //mapDirectionsWithResources();
     }
 
     private static void mapDirectionsWithResources(){
@@ -134,7 +140,8 @@ public class IconDataset {
         directionNames.put(R.drawable.lane_straight_tall_svg,Directions.STRAIGHT);
         directionNames.put(R.drawable.lane_uturn_short_svg,Directions.U_RIGHT);
         directionNames.put(R.drawable.lane_uturn_svg,Directions.U_RIGHT);
-        directionNames.put(-1,Directions.UNKNOWN);
+        directionNames.put(R.drawable.notification_icon,Directions.UNKNOWN);
+        directionNames.put(0, Directions.UNKNOWN);
 
         //sort by value so that same directions remain together
         directionNames = sortDirectionNamesByValue(directionNames);
@@ -158,15 +165,15 @@ public class IconDataset {
     protected static int getMatchingIcon(Bitmap a){
 
         //load data if not loaded
-        if (bitmapData==null)loadBitmapData();
+        //if (bitmapData==null)loadBitmapData();
 
-        double maxSimilarity=0,prevSimilarity=0;
-        int maxId=0;
+        double maxSimilarity = 0, prevSimilarity = 0;
+        int maxId = 0;
         String prevDirection = "";
         ArrayList<Integer> targetPixels = PixelProcessingService.getAlphaPixels(a);
 
         //traverse array and compare
-        for(Map.Entry<Integer, ArrayList<Integer>> res:bitmapData.entrySet()){
+        for (Map.Entry<Integer, ArrayList<Integer>> res : bitmapData.entrySet()) {
 
             //get current direction name from current resId
             int currResId = res.getKey();
@@ -183,7 +190,7 @@ public class IconDataset {
                 maxId = currResId;//for debugging
 
                 double diff = Math.abs(val-prevSimilarity);
-                if(diff>=0 && diff<=0.15d && currDirection!=null && currDirection.equals(prevDirection) && maxSimilarity>0.6){
+                if(diff >= 0 && diff <= 0.15d && currDirection != null && currDirection.equals(prevDirection) && maxSimilarity>0.6){
                     //if the previous similarity is almost same and the direction is also same
                     //no redundant comparison needed
                     Log.d(TAG, "contains: DirectionDetected >> " + currDirection);

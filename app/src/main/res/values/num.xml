@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="first_unit_min">50</integer>
+    <integer name="first_unit_max">500</integer>
+    <integer name="first_unit_interval">50</integer>
+    <item name="second_unit_min" type="integer" format="float">0.1</item>
+    <item name="second_unit_max" type="integer" format="float">1.</item>
+    <item name="second_unit_interval" type="integer" format="float">.1</item>
+
+</resources>

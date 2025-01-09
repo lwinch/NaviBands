@@ -66,7 +66,8 @@ public class NotificationMonitor extends NotificationListenerService {
             String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
             Icon icon = notification.getLargeIcon();
 
-            if (!notificationTitle.equals(title) && icon != null) {
+
+            if (!notificationTitle.equals(title)) { // && icon != null
                 notificationTitle = title;
                 //create an intent object for broadcasting
                 Intent msgrcv = createNotificationIntent(title, text, icon);
@@ -77,10 +78,11 @@ public class NotificationMonitor extends NotificationListenerService {
 
                 context.sendBroadcast(msgrcv);
                 Log.d(TAG, "onNotificationPosted: broadcast " + title);
-            } else if (icon == null) {
-                Log.d(TAG, "onNotificationPosted: icon null for title" + title);
-                context.sendBroadcast(unknownNotificationIntent(title, text));
             }
+//            else if (icon == null) {
+//                Log.d(TAG, "onNotificationPosted: icon null for title" + title);
+//                context.sendBroadcast(unknownNotificationIntent(title, text));
+//            }
         }
 
 
@@ -93,10 +95,10 @@ public class NotificationMonitor extends NotificationListenerService {
                 .putExtra("icon", icon);
     }
 
-    Intent unknownNotificationIntent(String title, String text) {
-        return new Intent(DIRECTION_BROADCAST)
-                .putExtra("newData", title + "\n" + text + "\n\n");
-    }
+//    Intent unknownNotificationIntent(String title, String text) {
+//        return new Intent(DIRECTION_BROADCAST)
+//                .putExtra("newData", title + "\n" + text + "\n\n");
+//    }
 
     class BindReceiver extends BroadcastReceiver {
         private static final String TAG = "NotificationMonitor:BindReceiver";

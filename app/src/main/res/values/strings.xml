@@ -35,5 +35,8 @@
     <string name="notification_listener_service_explanation">"For the app to work, you need to enable the Notification Listener Service. Enable it now?"</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="first_distance_unit">ft</string>
+    <string name="second_distance_unit">mi</string>
+
 
 </resources>

@@ -3,7 +3,6 @@ package com.example.maptest;
 import static com.example.maptest.App.FOREGROUND_CHANNEL_ID;
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
 import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;
-import static com.example.maptest.Constants.REROUTING;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.graphics.drawable.IconCompat;
 
 import java.util.Arrays;
 
@@ -38,7 +38,7 @@ public class ForegroundService extends Service {
     NotificationManager notificationManager;
     NotificationChannel notificationChannel;
     final String CHANNEL_ID = "naviBands maps push";
-    private int currentThreshold;
+    private double currentThreshold;
     int notification_id = 0;
     MiBand miBand;
 
@@ -60,7 +60,7 @@ public class ForegroundService extends Service {
         String text = intent.getStringExtra("text");
         Log.d(TAG, "onStartCommand: " + title + " | " + text);
         stopForeground(flags);
-        currentThreshold = intent.getIntExtra("currentThreshold", 5);
+        currentThreshold = intent.getDoubleExtra("currentThreshold", 5.);
         Notification notification = getForegroundNotification(this, title, text);
         startForeground(420, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
         return START_STICKY;
@@ -103,14 +103,14 @@ public class ForegroundService extends Service {
         notificationManager.createNotificationChannel(notificationChannel);
     }
 
-    private void sendNotification(Context context, String title, String text, int iconRes, Icon icon) {
-        Intent notificationIntent = new Intent(context, MainActivity.class);
+    private void sendNotification(Context context, String title, String text, int smallIcon, Icon largeIcon) {
+        Intent notificationIntent = new Intent(context, ForegroundService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText("Navigating : " + text)
-                .setSmallIcon(iconRes)
-                .setLargeIcon(icon)
+                .setSmallIcon(smallIcon)
+                .setLargeIcon(largeIcon)
                 .setContentIntent(pendingIntent)
                 .setOnlyAlertOnce(true)
                 .build();
@@ -118,7 +118,7 @@ public class ForegroundService extends Service {
         notificationManager.cancelAll();
         notificationManager.notify(notification_id, notification);
         notification_id += 1;
-        Log.d(TAG, "notification sent");
+        Log.d(TAG, "notification sent: " + title);
     }
 
     class NotificationReceiver extends BroadcastReceiver {
@@ -132,24 +132,33 @@ public class ForegroundService extends Service {
             Icon icon = intent.getParcelableExtra("icon", Icon.class);
 
             //process the intent with pixel details and get result intent
-            int iconRes = PixelProcessingService.getDirection(context, intent);
-            StringBuilder newData = new StringBuilder();
-            if (REROUTING.equals(title)) {
-                Log.d(TAG, "onReceive: Intent is REROUTING");
-                ForegroundService.this.sendNotification(context, title, text, iconRes, icon);
-                newData.append(REROUTING).append("\n\n");
+            int iconRes;
+            if (icon != null) {
+                try {
+                    Log.d(TAG, "icon res pack: " + icon.getResPackage());
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage());
+                    Log.d(TAG, Arrays.toString(e.getStackTrace()));
+                }
+                iconRes = PixelProcessingService.getDirection(icon.loadDrawable(context));
+            } else {
+                iconRes = R.drawable.notification_icon;
             }
-            else if (title != null && title.indexOf(" ") > 0) {
-                String direction = IconDataset.directionNames.get(iconRes);
+            String direction = IconDataset.directionNames.get(iconRes);
+            StringBuilder newData = new StringBuilder();
+            if (title != null && title.indexOf(" ") > 0) {
                 Log.d(TAG, "getDirection: DIRECTION DETECTED " + direction);
                 //get unit and distance from title
 
-                String t = title.substring(0, title.indexOf(" ")).trim().toLowerCase();
+                String distStr = title.substring(0, title.indexOf(" ")).trim().toLowerCase();
+                String unit = title.substring(title.indexOf(" ") + 1).trim().toLowerCase();
+                Log.d(TAG, "unit: <" + unit + ">");
+                Log.d(TAG, "dist unit: <" + getString(R.string.first_distance_unit) + ">");
                 try {
-                    int distance = Integer.parseInt(t);
+                    double distance = Double.parseDouble(distStr);
                     String msg = direction + " in " + title;
                     newData.append(msg).append("\n").append(text).append("\n\n");
-                    if (distance <= currentThreshold) {
+                    if (distance <= currentThreshold && unit.equals(getString(R.string.first_distance_unit))) {
                         ForegroundService.this.sendNotification(context, msg, text, iconRes, icon);
                         Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
                     }
@@ -157,7 +166,8 @@ public class ForegroundService extends Service {
                     Log.e(TAG, e.toString());
                     Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 }
-            } else {
+            } else if (title != null) {
+                ForegroundService.this.sendNotification(context, title, text, iconRes, icon);
                 newData.append(title).append("\n").append(text).append("\n\n");
             }
 

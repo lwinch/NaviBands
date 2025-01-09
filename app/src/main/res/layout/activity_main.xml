@@ -54,8 +54,8 @@
     <SeekBar
         android:layout_marginTop="16dp"
         android:id="@+id/thresholdSeek"
-        android:max="100"
-        android:progress="5"
+        android:max="@integer/first_unit_max"
+        android:progress="@integer/first_unit_max"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_columnWeight="1"
