@@ -57,6 +57,7 @@ public class IconDataset {
                     R.drawable.da_turn_slight_right_svg,
                     R.drawable.da_turn_straight_svg,
                     R.drawable.da_turn_uturn_svg,
+
                     R.drawable.ic_alternate_route_svg,
                     R.drawable.ic_arrive_right_svg,
                     R.drawable.ic_roundabout_exit_svg,
@@ -74,6 +75,7 @@ public class IconDataset {
                     R.drawable.ic_turn_sharp_right_svg,
                     R.drawable.ic_turn_slight_right_svg,
                     R.drawable.ic_u_turn_svg,
+
                     R.drawable.lane_normal_short_svg,
                     R.drawable.lane_normal_svg,
                     R.drawable.lane_sharp_short_svg,
@@ -206,26 +208,26 @@ public class IconDataset {
         return maxId;
     }
 
-    private static double cosineSimilarity(ArrayList<Integer> a,ArrayList<Integer> b){
+    private static double cosineSimilarity(ArrayList<Integer> a, ArrayList<Integer> b){
         int size = a.size();
         double similarity;
-        double sumAB=0,Asq=0,Bsq=0;
+        double sumAB = 0, Asq = 0, Bsq = 0;
 
         for (int i = 0; i < size; i++) {
             //extract alpha value from pixel value
             int alphaA = a.get(i);
             int alphaB = b.get(i);
             //calculate and update cosine similarity factors
-            sumAB+=(alphaA*alphaB);
-            Asq+=(alphaA*alphaA);
-            Bsq+=(alphaB*alphaB);
+            sumAB += (alphaA * alphaB);
+            Asq += (alphaA * alphaA);
+            Bsq += (alphaB * alphaB);
 
         }
         //square root for denominator
         Asq = Math.sqrt(Asq);
         Bsq = Math.sqrt(Bsq);
         //calculate the similarity value
-        similarity = (sumAB/(Asq*Bsq));
+        similarity = (sumAB / (Asq * Bsq));
 
         return similarity;
     }

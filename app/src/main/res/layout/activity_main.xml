@@ -49,11 +49,11 @@
         android:layout_columnWeight="1"
         android:textAlignment="center"
         android:layout_columnSpan="1"
-        android:text="@string/vibrate_distance"
+        android:text="@string/vibrate_distance_minor"
         />
     <SeekBar
         android:layout_marginTop="16dp"
-        android:id="@+id/thresholdSeek"
+        android:id="@+id/thresholdSeekMinor"
         android:max="@integer/first_unit_max"
         android:progress="@integer/first_unit_max"
         android:layout_width="0dp"
@@ -64,7 +64,6 @@
         />
     <TextView
         android:layout_marginTop="16dp"
-
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_columnWeight="1"
@@ -76,9 +75,54 @@
         />
     <TextView
         android:layout_marginTop="16dp"
-        android:id="@+id/thresholdTv"
+        android:id="@+id/thresholdTvMinor"
         android:textSize="24sp"
-        tools:text="5"
+        tools:text="500ft"
+        android:layout_gravity="center_vertical"
+        android:textColor="#ff0000"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:textAlignment="center"
+        android:layout_columnSpan="1"
+        />
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:textAlignment="center"
+        android:layout_columnSpan="1"
+        android:text="@string/vibrate_distance_major"
+        />
+    <SeekBar
+        android:layout_marginTop="16dp"
+        android:id="@+id/thresholdSeekMajor"
+        android:max="@integer/second_unit_max"
+        android:progress="@integer/second_unit_max"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:layout_columnSpan="1"
+        android:layout_gravity="center_vertical"
+        />
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:textAlignment="center"
+        android:layout_columnSpan="1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="@string/threshold"
+        />
+    <TextView
+        android:layout_marginTop="16dp"
+        android:id="@+id/thresholdTvMajor"
+        android:textSize="24sp"
+        tools:text="1mi"
         android:layout_gravity="center_vertical"
         android:textColor="#ff0000"
         android:textStyle="bold"
@@ -123,14 +167,13 @@
         android:textAlignment="center"
         android:textSize="16sp" />
 
-
     <TextView
         android:id="@+id/bandBatteryStatusTv"
         android:layout_columnSpan="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_columnWeight="1"
-        android:text="69%"
+        android:text="--%"
         android:textAlignment="center"
         android:paddingTop="8dp"
         />
@@ -146,14 +189,13 @@
         android:paddingTop="8dp"
         />
 
-
     <TextView
         android:id="@+id/bandChargingStatusTv"
         android:layout_columnSpan="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_columnWeight="1"
-        android:text="@string/status_discharging"
+        android:text="@string/status_not_available"
         android:textAlignment="center"
         android:paddingTop="8dp"
         />

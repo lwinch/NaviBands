@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.graphics.drawable.IconCompat;
 
 import java.util.Arrays;
 
@@ -38,7 +37,8 @@ public class ForegroundService extends Service {
     NotificationManager notificationManager;
     NotificationChannel notificationChannel;
     final String CHANNEL_ID = "naviBands maps push";
-    private double currentThreshold;
+    private int currentMinorThreshold;
+    private int currentMajorThreshold;
     int notification_id = 0;
     MiBand miBand;
 
@@ -60,7 +60,8 @@ public class ForegroundService extends Service {
         String text = intent.getStringExtra("text");
         Log.d(TAG, "onStartCommand: " + title + " | " + text);
         stopForeground(flags);
-        currentThreshold = intent.getDoubleExtra("currentThreshold", 5.);
+        currentMinorThreshold = intent.getIntExtra("currentMinorThreshold", 500);
+        currentMajorThreshold = intent.getIntExtra("currentMajorThreshold", 10);
         Notification notification = getForegroundNotification(this, title, text);
         startForeground(420, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
         return START_STICKY;
@@ -72,7 +73,7 @@ public class ForegroundService extends Service {
 
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContentTitle(title)
-                .setContentText(text + "\nDistance threshold: " + currentThreshold)
+                .setContentText(text + "\nDistance threshold: " + currentMinorThreshold)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(pendingIntent)
                 .setOnlyAlertOnce(true)
@@ -123,6 +124,7 @@ public class ForegroundService extends Service {
 
     class NotificationReceiver extends BroadcastReceiver {
         private static final String TAG = "NotificationReceiver";
+        private String lastDirection = "";
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -135,7 +137,7 @@ public class ForegroundService extends Service {
             int iconRes;
             if (icon != null) {
                 try {
-                    Log.d(TAG, "icon res pack: " + icon.getResPackage());
+                    Log.d(TAG, "icon res pack: " + icon.loadDrawable(context));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage());
                     Log.d(TAG, Arrays.toString(e.getStackTrace()));
@@ -158,9 +160,12 @@ public class ForegroundService extends Service {
                     double distance = Double.parseDouble(distStr);
                     String msg = direction + " in " + title;
                     newData.append(msg).append("\n").append(text).append("\n\n");
-                    if (distance <= currentThreshold && unit.equals(getString(R.string.first_distance_unit))) {
+                    if ((!lastDirection.equals(direction)) ||
+                            (distance <= currentMinorThreshold && unit.equals(getString(R.string.first_distance_unit))) ||
+                            (distance <= currentMajorThreshold / 10. && unit.equals(getString(R.string.second_distance_unit)))) {
                         ForegroundService.this.sendNotification(context, msg, text, iconRes, icon);
                         Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
+                        lastDirection = direction;
                     }
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());

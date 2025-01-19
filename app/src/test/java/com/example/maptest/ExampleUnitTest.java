@@ -1,21 +1,13 @@
 package com.example.maptest;
 
-import android.text.TextUtils;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jashgopani.github.io.mibandsdk.models.CustomVibration;
 
-import static org.apache.commons.lang3.StringUtils.difference;
 import static org.junit.Assert.*;
 
 /**

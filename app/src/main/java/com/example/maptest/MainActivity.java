@@ -30,7 +30,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.math.MathUtils;
+
+import com.example.maptest.uiListeners.MajorSeekBarChangeListener;
+import com.example.maptest.uiListeners.MinorSeekBarChangeListener;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Context context;
     ToggleButton toggleMonitoringBtn;
-    TextView logTv, statusTv, thresholdTv, bandMacTv;
+    TextView logTv, statusTv, thresholdTvMinor, thresholdTvMajor, bandMacTv;
     TextView bandConnectionStatusTv, bandBatteryStatusTv, bandChargingStatusTv;
     Button gotoConnectBtn;
-    SeekBar thresholdSb;
+    SeekBar thresholdSbMinor;
+    SeekBar thresholdSbMajor;
 //    private LiveData<Double> currentThreshold;
     boolean monitoringMode;
     MiBand miband;
@@ -98,8 +101,10 @@ public class MainActivity extends AppCompatActivity {
         toggleMonitoringBtn = findViewById(R.id.toggleMonitoringBtn);
         logTv = findViewById(R.id.logtv);
         statusTv = findViewById(R.id.statustv);
-        thresholdSb = findViewById(R.id.thresholdSeek);
-        thresholdTv = findViewById(R.id.thresholdTv);
+        thresholdSbMinor = findViewById(R.id.thresholdSeekMinor);
+        thresholdSbMajor = findViewById(R.id.thresholdSeekMajor);
+        thresholdTvMinor = findViewById(R.id.thresholdTvMinor);
+        thresholdTvMajor = findViewById(R.id.thresholdTvMajor);
         gotoConnectBtn = findViewById(R.id.gotoConnectBtn);
         bandMacTv = findViewById(R.id.bandMacTv);
         bandConnectionStatusTv = findViewById(R.id.bandConnectedStatusTv);
@@ -113,10 +118,14 @@ public class MainActivity extends AppCompatActivity {
         monitoringMode = false;
 
         //seek bar and its related text view
-        thresholdSb.setProgress(settingsDataStore.getDistanceThreshold());
-        String thresholdText = settingsDataStore.getDistanceThreshold()
+        thresholdSbMinor.setProgress(settingsDataStore.getMinorDistanceThreshold());
+        thresholdSbMajor.setProgress(settingsDataStore.getMajorDistanceThreshold());
+        String minorThresholdText = settingsDataStore.getMinorDistanceThreshold()
                 + getString(R.string.first_distance_unit);
-        thresholdTv.setText(thresholdText);
+        String majorThresholdText = settingsDataStore.getMajorDistanceThreshold() / 10.
+                + getString(R.string.second_distance_unit);
+        thresholdTvMinor.setText(minorThresholdText);
+        thresholdTvMajor.setText(majorThresholdText);
 
         //For MiBand
         miband = MiBand.getInstance(MainActivity.this);
@@ -157,31 +166,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        thresholdSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Resources res = getResources();
-                progress = MathUtils.clamp(progress, res.getInteger(R.integer.first_unit_min), res.getInteger(R.integer.first_unit_max));
-                int currentThreshold = roundTo(progress, res.getInteger(R.integer.first_unit_interval));
-                settingsDataStore.updateDistanceThreshold(currentThreshold);
-                String thresholdText = currentThreshold + getString(R.string.first_distance_unit);
-                thresholdTv.setText(thresholdText);
-                thresholdTv.setTextColor(Color.RED);
-            }
-
-            private int roundTo(int i, int r) {
-                r = Math.max(1, r);
-                return (int) Math.max(r * (Math.round((double) i / r)),0);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
+        Resources res = getResources();
+        thresholdSbMinor.setOnSeekBarChangeListener(new MinorSeekBarChangeListener(res, settingsDataStore, thresholdTvMinor));
+        thresholdSbMajor.setOnSeekBarChangeListener(new MajorSeekBarChangeListener(res, settingsDataStore, thresholdTvMajor));
 
         gotoConnectBtn.setOnClickListener(v-> {
             Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
@@ -250,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(context, ForegroundService.class);
         intent.putExtra("title", "NaviBands");
         intent.putExtra("text", "Navigation Mode ON");
-        intent.putExtra("currentThreshold", settingsDataStore.getDistanceThreshold());
+        intent.putExtra("currentMinorThreshold", settingsDataStore.getMinorDistanceThreshold());
+        intent.putExtra("currentMajorThreshold", settingsDataStore.getMajorDistanceThreshold());
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);
     }

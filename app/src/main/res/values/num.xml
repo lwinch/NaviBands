@@ -3,8 +3,8 @@
     <integer name="first_unit_min">50</integer>
     <integer name="first_unit_max">500</integer>
     <integer name="first_unit_interval">50</integer>
-    <item name="second_unit_min" type="integer" format="float">0.1</item>
-    <item name="second_unit_max" type="integer" format="float">1.</item>
-    <item name="second_unit_interval" type="integer" format="float">.1</item>
+    <integer name="second_unit_min">1</integer>
+    <integer name="second_unit_max">10</integer>
+    <integer name="second_unit_interval">1</integer>
 
 </resources>

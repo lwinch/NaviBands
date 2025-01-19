@@ -66,7 +66,6 @@ public class NotificationMonitor extends NotificationListenerService {
             String text = textCS == null ? "ANDROID_TEXT_NOT_FOUND" : textCS.toString();
             Icon icon = notification.getLargeIcon();
 
-
             if (!notificationTitle.equals(title)) { // && icon != null
                 notificationTitle = title;
                 //create an intent object for broadcasting
