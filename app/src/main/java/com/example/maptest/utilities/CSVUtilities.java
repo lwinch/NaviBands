@@ -1,4 +1,4 @@
-package com.example.maptest;
+package com.example.maptest.utilities;
 
 import android.content.Context;
 import android.util.Log;

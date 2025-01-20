@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.maptest.IconService.PixelProcessingUtilities;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +96,7 @@ public class ExampleInstrumentedTest {
         Log.d(TAG, "cosineSimilarity: Comparison Time >> "+difference+"ms");
         Log.d(TAG, "cosineSimilarity: Similarity >> "+similarity);
         Log.d(TAG, "results >> "+(similarity>threshold?"Same Icons":"Different Icons"));
-        String storedImage = PixelProcessingService.storeImage(res.extractAlpha(), c);
+        String storedImage = PixelProcessingUtilities.storeImage(res.extractAlpha(), c);
         Log.d(TAG, "cosineSimilarity: StoreDifference >> "+storedImage);
 
         return (similarity > threshold);
@@ -124,7 +126,7 @@ public class ExampleInstrumentedTest {
         drawable.draw(canvas);
 
         //return alpha bitmap of size 100x100
-        return PixelProcessingService.scaleBitmap(bitmap.extractAlpha(),bitmap.getWidth(),bitmap.getHeight(),100f,100f);
+        return PixelProcessingUtilities.scaleBitmap(bitmap.extractAlpha(),bitmap.getWidth(),bitmap.getHeight(),100f,100f);
     }
 
     @Test

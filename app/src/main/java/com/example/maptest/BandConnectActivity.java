@@ -1,5 +1,8 @@
 package com.example.maptest;
 
+import static com.example.maptest.Constants.DEVICE_CONNECTED;
+import static com.example.maptest.Constants.DEVICE_NULL;
+
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -98,7 +101,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(handleConnectionNext(), handleConnectionError(),handleConnectionComplete()));
         }
-        setResult(App.DEVICE_NULL);
+        setResult(DEVICE_NULL);
         permissionStatus = new HashMap<>();
         permissionsLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), permissionStatus::putAll);
@@ -332,7 +335,7 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
             Log.d(TAG, "handleConnectionNext: From connectionSubject : "+MiBand.getStatus(result));
             if(result==MiBand.PAIRED){
                 paired = true;
-                setResult(App.DEVICE_CONNECTED);
+                setResult(DEVICE_CONNECTED);
                 if (requestCode != -1) {
                     finish();
                 }
@@ -380,10 +383,10 @@ public class BandConnectActivity extends AppCompatActivity implements ScanResult
     public void onBackPressed() {
         if(miBand.getDevice()==null){
 //            toast("You Need To Connect to a device first");
-            setResult(App.DEVICE_NULL);
+            setResult(DEVICE_NULL);
             finish();
         }else{
-            setResult(App.DEVICE_CONNECTED);
+            setResult(DEVICE_CONNECTED);
             finish();
         }
     }

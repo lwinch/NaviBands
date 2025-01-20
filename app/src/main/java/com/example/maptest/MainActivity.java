@@ -1,5 +1,8 @@
 package com.example.maptest;
 
+import static com.example.maptest.Constants.DEVICE_CONNECTED;
+import static com.example.maptest.Constants.DEVICE_DISCONNECTED;
+import static com.example.maptest.Constants.DEVICE_NULL;
 import static com.example.maptest.Constants.DIRECTION_BROADCAST;
 import static com.example.maptest.Constants.NOTIFICATION_MONITOR_UNBIND;
 
@@ -31,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.maptest.IconService.Directions;
 import com.example.maptest.uiListeners.MajorSeekBarChangeListener;
 import com.example.maptest.uiListeners.MinorSeekBarChangeListener;
 
@@ -63,13 +67,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> vibrateOnlyAdapter;
     //private CompositeDisposable disposables;
     private Disposable batteryDisposable;
-
     String[] vibrateModesArray;
-
     private Map<String, Boolean> permissionStatus;
-
     private ActivityResultLauncher<String[]> permissionsLauncher;
-
     private SettingsDataStore settingsDataStore;
     final BroadcastReceiver directionsReceiver = new BroadcastReceiver() {
 
@@ -356,13 +356,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==69){//result is from connect activity
-            if(resultCode==App.DEVICE_CONNECTED){
+            if(resultCode == DEVICE_CONNECTED){
                 Log.d(TAG, "onActivityResult: Device Connected = "+miband.getDevice());
                 miband.vibrate(CustomVibration.SMILE);
                 refreshBatteryInfo(true);
-            }else if(resultCode == App.DEVICE_DISCONNECTED){
+            }else if(resultCode == DEVICE_DISCONNECTED){
                 Log.d(TAG, "onActivityResult: No device connected");
-            }else if(resultCode == App.DEVICE_NULL){
+            }else if(resultCode == DEVICE_NULL){
                 Log.d(TAG, "onActivityResult: No device selected");
             }
             updateBandStats();

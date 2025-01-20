@@ -1,4 +1,4 @@
-package com.example.maptest;
+package com.example.maptest.IconService;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class PixelProcessingService {
+public class PixelProcessingUtilities {
     private static final String TAG = "PixelProcessingService";
 
     //get alpha pixels of Bitmap as a list
@@ -67,7 +67,7 @@ public class PixelProcessingService {
     }
 
     //resize bitmap
-    protected static Bitmap scaleBitmap(Bitmap cbOriginal, int width, int height, float newWidth, float newHeight) {
+    public static Bitmap scaleBitmap(Bitmap cbOriginal, int width, int height, float newWidth, float newHeight) {
         //find scaling factors
         float scaleWidth = newWidth / width;
         float scaleHeight = newHeight / height;
@@ -78,24 +78,28 @@ public class PixelProcessingService {
         return Bitmap.createBitmap(cbOriginal, 0, 0, width, height, matrix, true);
     }
 
-    //get Direction from icons
-    protected static int getDirection(Drawable drawable) {
-        Log.d(TAG, "getDirection: Inside PixelProcessingService");
-        Log.d(TAG, "getDirection: Starting processing of BITMAP");
-        //Perform operations and calculate processing time
-        long start_time = System.nanoTime();
+    public static double cosineSimilarity(ArrayList<Integer> a, ArrayList<Integer> b) {
+        int size = a.size();
+        double similarity;
+        double sumAB = 0, Asq = 0, Bsq = 0;
 
-        //convert icon to bitmap
-        Bitmap currentBitmap = getComparableBitmap(drawable);
-        int matchingRes = IconDataset.getMatchingIcon(currentBitmap);
-//        String filename = storeImage(currentBitmap,context);
-//        Log.d(TAG, "Stored >> "+title+" | "+text+" | "+direction + " | "+filename);
+        for (int i = 0; i < size; i++) {
+            //extract alpha value from pixel value
+            int alphaA = a.get(i);
+            int alphaB = b.get(i);
+            //calculate and update cosine similarity factors
+            sumAB += (alphaA * alphaB);
+            Asq += (alphaA * alphaA);
+            Bsq += (alphaB * alphaB);
 
-        long end_time = System.nanoTime();
-        double difference = (end_time - start_time) / 1e6;
-        Log.d(TAG, "getDirection: Processing time: " + difference + " ");
+        }
+        //square root for denominator
+        Asq = Math.sqrt(Asq);
+        Bsq = Math.sqrt(Bsq);
+        //calculate the similarity value
+        similarity = (sumAB / (Asq * Bsq));
 
-        return matchingRes;
+        return similarity;
     }
 
     //Create a File for saving an image or video

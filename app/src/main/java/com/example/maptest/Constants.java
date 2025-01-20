@@ -17,6 +17,9 @@ public class Constants {
     public static final String DIRECTION_UNKNOWN = "Direction 404";
     public static final String DIRECTION_KNOWN = "Direction Found";
     public static String DEBUG_PATH = "";
+    protected static final int DEVICE_CONNECTED = 167;
+    protected static final int DEVICE_DISCONNECTED = 546;
+    protected static final int DEVICE_NULL = 938;
 
 }
 

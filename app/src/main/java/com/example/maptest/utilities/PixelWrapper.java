@@ -1,4 +1,4 @@
-package com.example.maptest;
+package com.example.maptest.utilities;
 
 import androidx.annotation.NonNull;
 
