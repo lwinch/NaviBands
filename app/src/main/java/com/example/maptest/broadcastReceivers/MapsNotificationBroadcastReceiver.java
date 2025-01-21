@@ -9,6 +9,7 @@ import android.graphics.drawable.Icon;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.maptest.IconService.IconData;
 import com.example.maptest.IconService.IconService;
 import com.example.maptest.R;
 import com.example.maptest.notifications.DirectionsNotificationChannel;
@@ -41,7 +42,7 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
         Icon icon = intent.getParcelableExtra("icon", Icon.class);
 
         //process the intent with pixel details and get result intent
-        int iconRes;
+        IconData iconData;
         if (icon != null) {
             try {
                 Log.d(TAG, "icon res pack: " + icon.loadDrawable(context));
@@ -49,11 +50,12 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                 Log.d(TAG, e.getMessage());
                 Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
-            iconRes = iconService.getDirection(icon.loadDrawable(context));
+            iconData = iconService.getDirection(icon.loadDrawable(context));
         } else {
-            iconRes = R.drawable.notification_icon;
+            iconData = new IconData(R.drawable.notification_icon, null);
         }
-        String direction = iconService.getDirectionName(iconRes);
+        String direction = iconData.getDirection().getEmoji();
+        int iconRes = iconData.getResId();
         StringBuilder newData = new StringBuilder();
         if (title != null && title.indexOf(" ") > 0) {
             Log.d(TAG, "getDirection: DIRECTION DETECTED " + direction);
