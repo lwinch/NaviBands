@@ -4,120 +4,102 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.maptest.R;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class IconService {
     private static final String TAG = "IconDataset";
-    private HashMap<Integer, String> iconData;
-    private HashMap<String, Direction> directionData;
     private List<IconData> bitmapData = null;
 
     public IconService(Context context) {
-        mapDirectionsWithResources();
-        mapDirectionData();
-        loadBitmapData(context);
-    }
-
-    private void loadBitmapData(Context context) {
+        HashMap<String, Direction> directionHashMap = mapDirectionData();
+        List<Pair<Integer, String>> iconDataList = mapDirectionsWithResources();
         bitmapData = new ArrayList<>();
-        for (int res : iconData.keySet()) {
+        for (Pair<Integer, String> pair : iconDataList) {
 //            Log.d(TAG, "res: " + res);
-            Bitmap bitmap = PixelProcessingUtilities.getComparableBitmap(context, res);
+            Bitmap bitmap = PixelProcessingUtilities.getComparableBitmap(context, pair.first);
             ArrayList<Integer> alphaPixels = PixelProcessingUtilities.getAlphaPixels(bitmap);
-            bitmapData.add(new IconData(res, alphaPixels));
+            IconData iconData = new IconData(pair.first, alphaPixels);
+            iconData.setDirection(directionHashMap.get(pair.second));
+            bitmapData.add(iconData);
         }
     }
 
-    private void mapDirectionsWithResources() {
-        iconData = new HashMap<>();
-        iconData.put(R.drawable.da_turn_arrive_right_svg, Directions.ARRIVED);
-        iconData.put(R.drawable.da_turn_arrive_svg, Directions.ARRIVED);
-        iconData.put(R.drawable.da_turn_depart_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.da_turn_fork_left_svg, Directions.LEFT);
-        iconData.put(R.drawable.da_turn_fork_right_svg, Directions.RIGHT);
-        iconData.put(R.drawable.da_turn_generic_roundabout_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.da_turn_ramp_right_svg, Directions.RIGHT);
-        iconData.put(R.drawable.da_turn_left_svg, Directions.LEFT);
-        iconData.put(R.drawable.da_turn_right_svg, Directions.RIGHT);
-        iconData.put(R.drawable.da_turn_roundabout_1_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.da_turn_roundabout_2_svg, Directions.RIGHT);
-        iconData.put(R.drawable.da_turn_roundabout_3_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.da_turn_roundabout_4_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.da_turn_roundabout_5_svg, Directions.SLIGHT_LEFT);
-        iconData.put(R.drawable.da_turn_roundabout_6_svg, Directions.LEFT);
-        iconData.put(R.drawable.da_turn_roundabout_7_svg, Directions.SHARP_LEFT);
-        iconData.put(R.drawable.da_turn_roundabout_8_svg, Directions.U_LEFT);
-        iconData.put(R.drawable.da_turn_roundabout_exit_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.da_turn_sharp_left_svg, Directions.SHARP_LEFT);
-        iconData.put(R.drawable.da_turn_sharp_right_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.da_turn_slight_left_svg, Directions.SLIGHT_LEFT);
-        iconData.put(R.drawable.da_turn_slight_right_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.da_turn_straight_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.da_turn_uturn_svg, Directions.U_LEFT);
+    private List<Pair<Integer, String>>  mapDirectionsWithResources() {
+        List<Pair<Integer, String>> iconData = new ArrayList<>();
+        iconData.add(new Pair<>(R.drawable.da_turn_arrive_right_svg, Directions.ARRIVED));
+        iconData.add(new Pair<>(R.drawable.da_turn_arrive_svg, Directions.ARRIVED));
+        iconData.add(new Pair<>(R.drawable.da_turn_depart_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_fork_left_svg, Directions.LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_fork_right_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_generic_roundabout_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_ramp_right_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_left_svg, Directions.LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_right_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_1_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_2_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_3_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_4_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_5_svg, Directions.SLIGHT_LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_6_svg, Directions.LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_7_svg, Directions.SHARP_LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_8_svg, Directions.U_LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_roundabout_exit_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_sharp_left_svg, Directions.SHARP_LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_sharp_right_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_slight_left_svg, Directions.SLIGHT_LEFT));
+        iconData.add(new Pair<>(R.drawable.da_turn_slight_right_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_straight_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.da_turn_uturn_svg, Directions.U_LEFT));
 
-        iconData.put(R.drawable.ic_alternate_route_svg, Directions.ALTERNATE);
-        iconData.put(R.drawable.ic_arrive_right_svg, Directions.ARRIVED);
-        iconData.put(R.drawable.ic_roundabout_exit_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.ic_roundabout_left_svg, Directions.LEFT);
-        iconData.put(R.drawable.ic_roundabout_right_svg, Directions.RIGHT);
-        iconData.put(R.drawable.ic_roundabout_sharp_left_svg, Directions.SHARP_LEFT);
-        iconData.put(R.drawable.ic_roundabout_sharp_right_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.ic_roundabout_slight_left_svg, Directions.SLIGHT_LEFT);
-        iconData.put(R.drawable.ic_roundabout_slight_right_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.ic_roundabout_straight_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.ic_roundabout_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.ic_roundabout_u_turn_svg, Directions.U_LEFT);
-        iconData.put(R.drawable.ic_straight_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.ic_turn_left_svg, Directions.LEFT);
-        iconData.put(R.drawable.ic_turn_right_svg, Directions.RIGHT);
-        iconData.put(R.drawable.ic_turn_sharp_left_svg, Directions.SHARP_LEFT);
-        iconData.put(R.drawable.ic_turn_sharp_right_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.ic_turn_slight_left_svg, Directions.SLIGHT_LEFT);
-        iconData.put(R.drawable.ic_turn_slight_right_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.ic_u_turn_svg, Directions.U_LEFT);
+        iconData.add(new Pair<>(R.drawable.ic_alternate_route_svg, Directions.ALTERNATE));
+        iconData.add(new Pair<>(R.drawable.ic_arrive_right_svg, Directions.ARRIVED));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_exit_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_left_svg, Directions.LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_right_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_sharp_left_svg, Directions.SHARP_LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_sharp_right_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_slight_left_svg, Directions.SLIGHT_LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_slight_right_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_straight_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_roundabout_u_turn_svg, Directions.U_LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_straight_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_left_svg, Directions.LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_right_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_sharp_left_svg, Directions.SHARP_LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_sharp_right_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_slight_left_svg, Directions.SLIGHT_LEFT));
+        iconData.add(new Pair<>(R.drawable.ic_turn_slight_right_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.ic_u_turn_svg, Directions.U_LEFT));
 
-        iconData.put(R.drawable.lane_normal_short_svg, Directions.RIGHT);
-        iconData.put(R.drawable.lane_normal_svg, Directions.RIGHT);
-        iconData.put(R.drawable.lane_sharp_short_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.lane_sharp_svg, Directions.SHARP_RIGHT);
-        iconData.put(R.drawable.lane_slight_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.lane_slight_tall_svg, Directions.SLIGHT_RIGHT);
-        iconData.put(R.drawable.lane_straight_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.lane_straight_tall_svg, Directions.STRAIGHT);
-        iconData.put(R.drawable.lane_uturn_short_svg, Directions.U_RIGHT);
-        iconData.put(R.drawable.lane_uturn_svg, Directions.U_RIGHT);
-        iconData.put(R.drawable.notification_icon, Directions.UNKNOWN);
-        //iconData.put(0, Directions.UNKNOWN);
+        iconData.add(new Pair<>(R.drawable.lane_normal_short_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_normal_svg, Directions.RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_sharp_short_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_sharp_svg, Directions.SHARP_RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_slight_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_slight_tall_svg, Directions.SLIGHT_RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_straight_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_straight_tall_svg, Directions.STRAIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_uturn_short_svg, Directions.U_RIGHT));
+        iconData.add(new Pair<>(R.drawable.lane_uturn_svg, Directions.U_RIGHT));
+        iconData.add(new Pair<>(R.drawable.notification_icon, Directions.UNKNOWN));
+        //iconData.add(0, Directions.UNKNOWN);
 
         //sort by value so that same directions remain together
-        iconData = sortDirectionNamesByValue(iconData);
+        iconData.sort(Comparator.comparing(pair -> pair.second));
+        return iconData;
     }
 
-    private HashMap<Integer, String> sortDirectionNamesByValue(HashMap<Integer, String> hm) {
-        // Create a list from elements of HashMap
-        List<Map.Entry<Integer, String>> list = new LinkedList<>(hm.entrySet());
-
-        // Sort the list
-        list.sort(Map.Entry.comparingByValue());
-
-        // put data from sorted list to hashmap
-        HashMap<Integer, String> temp = new LinkedHashMap<>();
-        for (Map.Entry<Integer, String> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
-    }
-
-    private void mapDirectionData() {
-        directionData = new HashMap<>();
+    private HashMap<String, Direction> mapDirectionData() {
+        HashMap<String, Direction> directionData = new HashMap<>();
         directionData.put(Directions.ARRIVED, new Direction(Directions.ARRIVED, "Arrived", "\uD83D\uDCCD"));
         directionData.put(Directions.STRAIGHT, new Direction(Directions.STRAIGHT, "Straight", "️⬆️"));
 
@@ -133,6 +115,7 @@ public class IconService {
 
         directionData.put(Directions.ALTERNATE, new Direction(Directions.ALTERNATE, "Alternate route", "❗"));
         directionData.put(Directions.UNKNOWN, new Direction(Directions.UNKNOWN, "Unknown", "❗"));
+        return directionData;
     }
 
     //get Direction from icons
@@ -144,18 +127,12 @@ public class IconService {
 
         //traverse array and compare
         for (IconData iconData : bitmapData) {
-            //get current direction name from current resId
-            String currDirection = this.iconData.getOrDefault(iconData.getResId(), Directions.UNKNOWN);
-
             //calc similarity
             double val = PixelProcessingUtilities.cosineSimilarity(iconData.getBitmapData(), targetPixels);
-
-            Log.d(TAG, "comparing with: " + currDirection + " | " + val);
-
+            Log.d(TAG, "comparing with: " + iconData.getDirection().getShortName() + " | " + val);
             if (val > maxSimilarity) {
                 maxSimilarity = val;
                 bestMatch = iconData; //for debugging
-                bestMatch.setDirection(this.directionData.get(currDirection));
 
 //                double diff = Math.abs(val - prevSimilarity);
 //                if (diff >= 0 && diff <= 0.15d && currDirection != null && currDirection.equals(prevDirection) && maxSimilarity > 0.6) {
@@ -179,7 +156,7 @@ public class IconService {
         Log.d(TAG, "getDirection: Inside IconService");
         Log.d(TAG, "getDirection: Starting processing of BITMAP");
         //Perform operations and calculate processing time
-        long start_time = System.nanoTime();
+        long startTime = System.nanoTime();
 
         //convert icon to bitmap
         Bitmap currentBitmap = PixelProcessingUtilities.getComparableBitmap(drawable);
@@ -187,9 +164,11 @@ public class IconService {
         //String filename = storeImage(currentBitmap,context);
         //Log.d(TAG, "Stored >> "+title+" | "+text+" | "+direction + " | "+filename);
 
-        long end_time = System.nanoTime();
-        double difference = (end_time - start_time) / 1e6;
-        Log.d(TAG, "getDirection: Processing time: " + difference + " seconds");
+        long endTime = System.nanoTime();
+        long difference = endTime - startTime;
+        long secondsTime = TimeUnit.NANOSECONDS.toMillis(difference);
+
+        Log.d(TAG, "getDirection: Processing time: " + secondsTime + " milliseconds");
 
         return matchingRes;
     }
