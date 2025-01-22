@@ -120,9 +120,9 @@
             android:layout_columnSpan="1"
             android:layout_columnWeight="1"
             android:layout_gravity="center_vertical"
-            android:max="@integer/second_unit_max"
+            android:max="@integer/second_unit_max_x10"
             android:orientation="vertical"
-            android:progress="@integer/second_unit_max" />
+            android:progress="@integer/second_unit_max_x10" />
 
         <TextView
             android:layout_width="0dp"
