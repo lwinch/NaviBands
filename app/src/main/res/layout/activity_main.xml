@@ -1,315 +1,311 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="center"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
     android:animateLayoutChanges="true"
-    android:columnCount="2"
-    android:foregroundGravity="center|center_vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/statustv"
-        android:layout_width="0dp"
+    <GridLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_columnSpan="2"
-        android:layout_columnWeight="1"
-        android:text="debug"
-        android:textAlignment="center"
-        android:textSize="24sp" />
+        android:layout_gravity="start"
+        android:animateLayoutChanges="true"
+        android:columnCount="2"
+        android:foregroundGravity="center|center_vertical">
+
+        <TextView
+            android:id="@+id/statusTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="@string/monitoring_off"
+            android:textAlignment="center"
+            android:textSize="24sp" />
 
 
-    <ToggleButton
-        android:layout_marginTop="16dp"
-        android:id="@+id/toggleMonitoringBtn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        android:text="Start Service"
-        android:textAlignment="center"
-        android:textOff="@string/monitoring_off"
-        android:textOn="@string/monitoring_on" />
-    <Button
-        android:layout_marginTop="16dp"
-        android:id="@+id/gotoConnectBtn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        android:text="Connect Miband"
-        android:textAlignment="center" />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        android:text="@string/vibrate_distance_minor"
-        />
-    <SeekBar
-        android:layout_marginTop="16dp"
-        android:id="@+id/thresholdSeekMinor"
-        android:max="@integer/first_unit_max"
-        android:progress="@integer/first_unit_max"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        android:layout_gravity="center_vertical"
-        />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="@string/threshold"
-        />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:id="@+id/thresholdTvMinor"
-        android:textSize="24sp"
-        tools:text="500ft"
-        android:layout_gravity="center_vertical"
-        android:textColor="#ff0000"
-        android:textStyle="bold"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        android:text="@string/vibrate_distance_major"
-        />
-    <SeekBar
-        android:layout_marginTop="16dp"
-        android:id="@+id/thresholdSeekMajor"
-        android:max="@integer/second_unit_max"
-        android:progress="@integer/second_unit_max"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        android:layout_gravity="center_vertical"
-        />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="@string/threshold"
-        />
-    <TextView
-        android:layout_marginTop="16dp"
-        android:id="@+id/thresholdTvMajor"
-        android:textSize="24sp"
-        tools:text="1mi"
-        android:layout_gravity="center_vertical"
-        android:textColor="#ff0000"
-        android:textStyle="bold"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textAlignment="center"
-        android:layout_columnSpan="1"
-        />
+        <ToggleButton
+            android:id="@+id/toggleMonitoringBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="@string/start_service"
+            android:textAlignment="center"
+            android:textOff="@string/monitoring_off"
+            android:textOn="@string/monitoring_on" />
 
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_columnSpan="2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Band Status"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"
-        />
+        <Button
+            android:id="@+id/gotoConnectBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="@string/connect_mi_band"
+            android:textAlignment="center" />
 
-    <TextView
-        android:layout_columnSpan="2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:textSize="8sp"
-        android:text="(Click on battery level to refresh)"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"
-        />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="@string/vibrate_distance_minor"
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/bandMacTv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnSpan="1"
-        android:layout_columnWeight="1"
-        android:text="Device Mac"
-        android:textAlignment="center"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/thresholdTvMinor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="0dp"
+            android:textAlignment="center"
+            android:textColor="#ff0000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="500ft" />
 
-    <TextView
-        android:id="@+id/bandBatteryStatusTv"
-        android:layout_columnSpan="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="--%"
-        android:textAlignment="center"
-        android:paddingTop="8dp"
-        />
+        <SeekBar
+            android:id="@+id/thresholdSeekMinor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:layout_marginTop="0dp"
+            android:max="@integer/first_unit_max"
+            android:orientation="vertical"
+            android:progress="@integer/first_unit_max" />
 
-    <TextView
-        android:id="@+id/bandConnectedStatusTv"
-        android:layout_columnSpan="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="@string/status_disconnected"
-        android:textAlignment="center"
-        android:paddingTop="8dp"
-        />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="@string/vibrate_distance_major"
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/bandChargingStatusTv"
-        android:layout_columnSpan="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="@string/status_not_available"
-        android:textAlignment="center"
-        android:paddingTop="8dp"
-        />
+        <TextView
+            android:id="@+id/thresholdTvMajor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="0dp"
+            android:textAlignment="center"
+            android:textColor="#ff0000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="1mi" />
 
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_columnSpan="2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Vibration Setting"
-        android:background="@android:color/holo_green_light"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"
-        />
+        <SeekBar
+            android:id="@+id/thresholdSeekMajor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center_vertical"
+            android:max="@integer/second_unit_max"
+            android:orientation="vertical"
+            android:progress="@integer/second_unit_max" />
 
-    <TextView
-        android:layout_columnSpan="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Vibrate only for "
-        android:textAlignment="center"
-        android:paddingTop="8dp"
-        />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorPrimary"
+            android:text="Band Status"
+            android:textAlignment="center"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:background="@color/colorPrimary"
+            android:text="(Click on battery level to refresh)"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/bandMacTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="Device Mac"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/bandBatteryStatusTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="--%"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/bandConnectedStatusTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="@string/status_disconnected"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/bandChargingStatusTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="@string/status_not_available"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/holo_green_light"
+            android:text="Vibration Setting"
+            android:textAlignment="center"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="Vibrate only for "
+            android:textAlignment="center" />
 
 
-    <Spinner
-        android:id="@+id/vibrateOnlySpinner"
-        android:layout_columnSpan="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="@string/status_discharging"
-        android:textAlignment="center"
-        android:paddingTop="8dp"
-        />
+        <Spinner
+            android:id="@+id/vibrateOnlySpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:paddingTop="8dp"
+            android:text="@string/status_discharging"
+            android:textAlignment="center" />
 
-    <TextView
-        android:layout_marginTop="16dp"
-        android:layout_columnSpan="2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Test Vibrations"
-        android:background="@android:color/holo_orange_light"
-        android:textAlignment="center"
-        />
-    <Button
-        android:text="Left"
-        android:id="@+id/testLeft"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:layout_columnWeight="1"
-        android:onClick="onClick"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/holo_orange_light"
+            android:text="Test Vibrations"
+            android:textAlignment="center" />
 
-        />
+        <Button
+            android:id="@+id/testLeft"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="Left" />
 
-    <Button
-        android:text="Right"
-        android:id="@+id/testRight"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:layout_columnWeight="1"
-        android:onClick="onClick"
-        />
+        <Button
+            android:id="@+id/testRight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="Right" />
 
-    <Button
-        android:text="Straight"
-        android:id="@+id/testStraight"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:onClick="onClick"
-        android:layout_columnWeight="1"
-        />
+        <Button
+            android:id="@+id/testStraight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="Straight" />
 
-    <Button
-        android:text="U-Turn"
-        android:id="@+id/testUturn"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:layout_columnWeight="1"
-        android:onClick="onClick"
-        />
+        <Button
+            android:id="@+id/testUturn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="U-Turn" />
 
-    <Button
-        android:text="Alternate\n(left / Right / Straight)"
-        android:id="@+id/testAlternate"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:onClick="onClick"
-        android:layout_columnWeight="1"
-        />
-    <Button
-        android:text="Arrived / Start / Unknown"
-        android:id="@+id/testArrived"
-        android:layout_width="0dp"
-        android:layout_columnSpan="1"
-        android:layout_columnWeight="1"
-        android:onClick="onClick"
-        />
+        <Button
+            android:id="@+id/testAlternate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="Alternate\n(left / Right / Straight)" />
 
-
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnSpan="2"
-        android:layout_columnWeight="1">
+        <Button
+            android:id="@+id/testArrived"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:onClick="onClick"
+            android:text="Arrived / Start / Unknown" />
 
         <TextView
             android:id="@+id/logtv"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
             android:gravity="center"
             android:text="" />
-    </ScrollView>
-</GridLayout>
+    </GridLayout>
+</ScrollView>

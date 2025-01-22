@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private void findViews() {
         toggleMonitoringBtn = findViewById(R.id.toggleMonitoringBtn);
         logTv = findViewById(R.id.logtv);
-        statusTv = findViewById(R.id.statustv);
+        statusTv = findViewById(R.id.statusTv);
         thresholdSbMinor = findViewById(R.id.thresholdSeekMinor);
         thresholdSbMajor = findViewById(R.id.thresholdSeekMajor);
         thresholdTvMinor = findViewById(R.id.thresholdTvMinor);

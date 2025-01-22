@@ -19,7 +19,7 @@
             android:layout_columnWeight="2"
             android:text="@string/status0"
             android:textAlignment="center"
-            android:textSize="24dp" />
+            android:textSize="24sp" />
 
         <ToggleButton
             android:id="@+id/scan_btn"
