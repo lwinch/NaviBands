@@ -19,7 +19,7 @@ public class SettingsDataStore {
 
     private SettingsDataStore(Context context) {
         this.minorDistThresholdDefault = context.getResources().getInteger(R.integer.first_unit_max);
-        this.majorDistThresholdDefault = context.getResources().getInteger(R.integer.second_unit_max);
+        this.majorDistThresholdDefault = context.getResources().getInteger(R.integer.second_unit_max_x10);
         sharedPreferences = context.getApplicationContext().getSharedPreferences(USER_PREFERENCES_NAME, Context.MODE_PRIVATE);
         //_distThresholdFlow.setValue(getDistanceThreshold());
     }
@@ -28,16 +28,19 @@ public class SettingsDataStore {
         return sharedPreferences.getInt(MINOR_DIST_THRESHOLD_KEY, minorDistThresholdDefault);
     }
 
-    public int getMajorDistanceThreshold() {
-        return sharedPreferences.getInt(MAJOR_DIST_THRESHOLD_KEY, majorDistThresholdDefault);
+    public double getMajorDistanceThreshold() {
+        return sharedPreferences.getInt(MAJOR_DIST_THRESHOLD_KEY, majorDistThresholdDefault) / 10.;
     }
 
+    public int getMajorDistanceThreshold_x10() {
+        return sharedPreferences.getInt(MAJOR_DIST_THRESHOLD_KEY, majorDistThresholdDefault);
+    }
 
     public void updateMinorDistanceThreshold(int distThreshold) {
         sharedPreferences.edit().putInt(MINOR_DIST_THRESHOLD_KEY, distThreshold).apply();
     }
 
-    public void updateMajorDistanceThreshold(int distThreshold) {
+    public void updateMajorDistanceThreshold_x10(int distThreshold) {
         sharedPreferences.edit().putInt(MAJOR_DIST_THRESHOLD_KEY, distThreshold).apply();
     }
 

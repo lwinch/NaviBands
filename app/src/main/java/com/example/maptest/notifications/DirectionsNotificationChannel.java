@@ -17,7 +17,7 @@ public class DirectionsNotificationChannel {
     private static final String TAG = "DirectionsNotificationChannel";
     private final NotificationManager notificationManager;
     public final String CHANNEL_ID = "naviBands maps push";
-    public final String CHANNEL_NAME  = "directions_notification_channel";
+    public final String CHANNEL_NAME  = "directions notification channel";
     public final String CHANNEL_DESCRIPTION = "notification channel for navigation push";
     int notification_id = 0;
 
@@ -34,7 +34,7 @@ public class DirectionsNotificationChannel {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(title)
-                .setContentText("Navigating : " + text)
+                .setContentText(text)
                 .setSmallIcon(smallIcon)
                 .setLargeIcon(largeIcon)
                 .setContentIntent(pendingIntent)

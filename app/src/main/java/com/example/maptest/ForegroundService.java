@@ -44,7 +44,7 @@ public class ForegroundService extends Service {
         Log.d(TAG, "onStartCommand: " + title + " | " + text);
         stopForeground(flags);
         int currentMinorThreshold = intent.getIntExtra("currentMinorThreshold", 500);
-        int currentMajorThreshold = intent.getIntExtra("currentMajorThreshold", 10);
+        double currentMajorThreshold = intent.getDoubleExtra("currentMajorThreshold", 1.);
         this.mapsNotificationBroadcastReceiver.updateThresholds(currentMinorThreshold, currentMajorThreshold);
         String notificationText = text  + "\nDistance threshold: " + currentMinorThreshold;
         Notification notification = ForegroundNotificationChannel.getForegroundNotification(this, title, notificationText);

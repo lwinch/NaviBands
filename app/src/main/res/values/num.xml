@@ -3,8 +3,9 @@
     <integer name="first_unit_min">50</integer>
     <integer name="first_unit_max">500</integer>
     <integer name="first_unit_interval">50</integer>
-    <integer name="second_unit_min">1</integer>
-    <integer name="second_unit_max">10</integer>
-    <integer name="second_unit_interval">1</integer>
+    <integer name="second_unit_min_x10">1</integer>
+    <integer name="second_unit_max_x10">10</integer>
+    <integer name="second_unit_interval_x10">1</integer>
+    <integer name="conversion_factor">5280</integer>
 
 </resources>

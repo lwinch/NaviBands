@@ -119,10 +119,10 @@ public class MainActivity extends AppCompatActivity {
 
         //seek bar and its related text view
         thresholdSbMinor.setProgress(settingsDataStore.getMinorDistanceThreshold());
-        thresholdSbMajor.setProgress(settingsDataStore.getMajorDistanceThreshold());
+        thresholdSbMajor.setProgress(settingsDataStore.getMajorDistanceThreshold_x10());
         String minorThresholdText = settingsDataStore.getMinorDistanceThreshold()
                 + getString(R.string.first_distance_unit);
-        String majorThresholdText = settingsDataStore.getMajorDistanceThreshold() / 10.
+        String majorThresholdText = settingsDataStore.getMajorDistanceThreshold()
                 + getString(R.string.second_distance_unit);
         thresholdTvMinor.setText(minorThresholdText);
         thresholdTvMajor.setText(majorThresholdText);
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(MainActivity.this,ForegroundService.class));
+        stopService(new Intent(MainActivity.this, ForegroundService.class));
         Log.d(TAG, "onDestroy: Main Activity destroyed");
         disconnectAndUnpair();
         //disposables.clear();

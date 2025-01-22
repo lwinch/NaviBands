@@ -21,15 +21,15 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
     private final DirectionsNotificationChannel directionsNotificationChannel;
     private final IconService iconService;
     private int minorThreshold = 0;
-    private int majorThreshold = 0;
-    private String lastDirection = "";
+    private double majorThreshold = 0.;
+    private double lastMinorUnitDist = 0.;
 
     public MapsNotificationBroadcastReceiver(Context context) {
         this.directionsNotificationChannel = new DirectionsNotificationChannel(context);
         this.iconService = new IconService(context);
     }
 
-    public void updateThresholds(int minorThreshold, int majorThreshold) {
+    public void updateThresholds(int minorThreshold, double majorThreshold) {
         this.minorThreshold = minorThreshold;
         this.majorThreshold = majorThreshold;
     }
@@ -69,12 +69,22 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                 double distance = Double.parseDouble(distStr);
                 String msg = direction + " in " + title;
                 newData.append(msg).append("\n").append(text).append("\n\n");
-                if ((!lastDirection.equals(direction)) ||
-                        (distance <= minorThreshold && unit.equals(context.getString(R.string.first_distance_unit))) ||
-                        (distance <= majorThreshold / 10. && unit.equals(context.getString(R.string.second_distance_unit)))) {
+                double minorUnitDistance = 0;
+                int conversionFactor = context.getResources().getInteger(R.integer.conversion_factor);
+                String minorUnit = context.getString(R.string.first_distance_unit);
+                String majorUnit = context.getString(R.string.second_distance_unit);
+                if (unit.equals(minorUnit)) {
+                    minorUnitDistance = distance;
+                } else if (unit.equals(majorUnit)) {
+                    minorUnitDistance = distance * conversionFactor;
+                }
+
+                if ((minorUnitDistance > lastMinorUnitDist) ||
+                        (minorUnitDistance <= minorThreshold) ||
+                        (minorUnitDistance <= majorThreshold * conversionFactor)) {
                     directionsNotificationChannel.sendNotification(context, msg, text, iconRes, icon);
                     Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
-                    lastDirection = direction;
+                    lastMinorUnitDist = minorUnitDistance;
                 }
             } catch (Exception e) {
                 Log.e(TAG, e.toString());

@@ -1,6 +1,5 @@
 package com.example.maptest;
 
-import static com.example.maptest.Constants.DIRECTION_BROADCAST;
 import static com.example.maptest.Constants.MAPS_PACKAGE;
 import static com.example.maptest.Constants.NOTIFICATION_MONITOR_UNBIND;
 import static com.example.maptest.Constants.NOTIFICATION_RECEIVED;

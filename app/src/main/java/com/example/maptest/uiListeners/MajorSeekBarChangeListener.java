@@ -2,7 +2,6 @@ package com.example.maptest.uiListeners;
 
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -27,10 +26,10 @@ public class MajorSeekBarChangeListener implements SeekBar.OnSeekBarChangeListen
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        progress = MathUtils.clamp(progress, res.getInteger(R.integer.second_unit_min), res.getInteger(R.integer.second_unit_max));
-        int currentThreshold = roundTo(progress, res.getInteger(R.integer.second_unit_interval));
-        settingsDataStore.updateMajorDistanceThreshold(currentThreshold);
-        String thresholdText = currentThreshold / 10. + res.getString(R.string.second_distance_unit);
+        progress = MathUtils.clamp(progress, res.getInteger(R.integer.second_unit_min_x10), res.getInteger(R.integer.second_unit_max_x10));
+        int currentThreshold_x10 = roundTo(progress, res.getInteger(R.integer.second_unit_interval_x10));
+        settingsDataStore.updateMajorDistanceThreshold_x10(currentThreshold_x10);
+        String thresholdText = currentThreshold_x10 / 10. + res.getString(R.string.second_distance_unit);
         thresholdTvMajor.setText(thresholdText);
         thresholdTvMajor.setTextColor(Color.RED);
     }
