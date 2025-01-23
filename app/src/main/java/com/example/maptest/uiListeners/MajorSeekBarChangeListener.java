@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.core.math.MathUtils;
 
 import com.example.maptest.R;
-import com.example.maptest.SettingsDataStore;
+import com.example.maptest.settings.SettingsDataStore;
 
 public class MajorSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
     private static final String TAG = "MajorSeekBarChangeListener";

@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,8 +37,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.maptest.IconService.Directions;
+import com.example.maptest.settings.PushRadioOption;
+import com.example.maptest.settings.SettingsDataStore;
 import com.example.maptest.uiListeners.MajorSeekBarChangeListener;
 import com.example.maptest.uiListeners.MinorSeekBarChangeListener;
+import com.example.maptest.uiListeners.PushRadioListener;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     Button gotoConnectBtn;
     SeekBar thresholdSbMinor;
     SeekBar thresholdSbMajor;
+    RadioGroup pushSettingGroup;
+    RadioButton pushOffRadio, pushEmojiRadio, pushLongRadio, pushShortRadio, pushCharRadio;
 //    private LiveData<Double> currentThreshold;
     boolean monitoringMode;
     MiBand miband;
@@ -103,6 +110,12 @@ public class MainActivity extends AppCompatActivity {
         statusTv = findViewById(R.id.statusTv);
         thresholdSbMinor = findViewById(R.id.thresholdSeekMinor);
         thresholdSbMajor = findViewById(R.id.thresholdSeekMajor);
+        pushSettingGroup = findViewById(R.id.radio_push_setting_group);
+        pushOffRadio = findViewById(R.id.radio_off);
+        pushEmojiRadio = findViewById(R.id.radio_emoji);
+        pushLongRadio = findViewById(R.id.radio_long_text);
+        pushShortRadio = findViewById(R.id.radio_short_text);
+        pushCharRadio = findViewById(R.id.radio_character);
         thresholdTvMinor = findViewById(R.id.thresholdTvMinor);
         thresholdTvMajor = findViewById(R.id.thresholdTvMajor);
         gotoConnectBtn = findViewById(R.id.gotoConnectBtn);
@@ -126,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                 + getString(R.string.second_distance_unit);
         thresholdTvMinor.setText(minorThresholdText);
         thresholdTvMajor.setText(majorThresholdText);
+
+        pushSettingGroup.check(settingsDataStore.getPushRadioOption().resId);
 
         //For MiBand
         miband = MiBand.getInstance(MainActivity.this);
@@ -169,6 +184,12 @@ public class MainActivity extends AppCompatActivity {
         Resources res = getResources();
         thresholdSbMinor.setOnSeekBarChangeListener(new MinorSeekBarChangeListener(res, settingsDataStore, thresholdTvMinor));
         thresholdSbMajor.setOnSeekBarChangeListener(new MajorSeekBarChangeListener(res, settingsDataStore, thresholdTvMajor));
+
+        pushOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.OFF, settingsDataStore));
+        pushEmojiRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.EMOJI, settingsDataStore));
+        pushLongRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.LONG_TXT, settingsDataStore));
+        pushShortRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.SHORT_TXT, settingsDataStore));
+        pushCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.CHAR, settingsDataStore));
 
         gotoConnectBtn.setOnClickListener(v-> {
             Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
@@ -239,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("text", "Navigation Mode ON");
         intent.putExtra("currentMinorThreshold", settingsDataStore.getMinorDistanceThreshold());
         intent.putExtra("currentMajorThreshold", settingsDataStore.getMajorDistanceThreshold());
+        intent.putExtra("pushNotificationSetting", settingsDataStore.getPushRadioOption().storeId);
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);
     }

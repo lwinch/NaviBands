@@ -1,4 +1,5 @@
 <resources>
+    <!--Main Activity layout-->
     <string name="app_name">MapTest</string>
     <string name="dev_mode_on">Dev Mode is ON</string>
     <string name="dev_mode_off">Dev Mode is OFF</string>
@@ -13,6 +14,7 @@
     <string name="vibrate_distance_minor">Select the notification threshold (minor units)</string>
     <string name="vibrate_distance_major">Select the notification threshold (major units)</string>
 
+    <!--MiBand connect layout-->
     <string name="status0">No device connected</string>
     <string name="stop_scan">Stop Scan</string>
     <string name="start_scan">Find device</string>
@@ -36,6 +38,7 @@
     <string name="connecting">Connecting…</string>
     <string name="disconnecting">Disconnecting…</string>
 
+    <!--Notification information dialog box-->
     <string name="notification_listener_service">"Notification Listener Service"</string>
     <string name="notification_listener_service_explanation">"For the app to work, you need to enable the Notification Listener Service. Enable it now?"</string>
     <string name="yes">Yes</string>
