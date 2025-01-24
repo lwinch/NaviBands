@@ -131,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
         monitoringMode = false;
 
         //seek bar and its related text view
-        thresholdSbMinor.setProgress(settingsDataStore.getMinorDistanceThreshold());
-        thresholdSbMajor.setProgress(settingsDataStore.getMajorDistanceThreshold_x10());
-        String minorThresholdText = settingsDataStore.getMinorDistanceThreshold()
+        thresholdSbMinor.setProgress(settingsDataStore.minorDistSetting.get());
+        thresholdSbMajor.setProgress(settingsDataStore.majorDistSetting.get_x10());
+        String minorThresholdText = settingsDataStore.minorDistSetting.get()
                 + getString(R.string.first_distance_unit);
-        String majorThresholdText = settingsDataStore.getMajorDistanceThreshold()
+        String majorThresholdText = settingsDataStore.majorDistSetting.get()
                 + getString(R.string.second_distance_unit);
         thresholdTvMinor.setText(minorThresholdText);
         thresholdTvMajor.setText(majorThresholdText);
@@ -258,8 +258,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(context, ForegroundService.class);
         intent.putExtra("title", "NaviBands");
         intent.putExtra("text", "Navigation Mode ON");
-        intent.putExtra("currentMinorThreshold", settingsDataStore.getMinorDistanceThreshold());
-        intent.putExtra("currentMajorThreshold", settingsDataStore.getMajorDistanceThreshold());
+        intent.putExtra("currentMinorThreshold", settingsDataStore.minorDistSetting.get());
+        intent.putExtra("currentMajorThreshold", settingsDataStore.majorDistSetting.get());
         intent.putExtra("pushNotificationSetting", settingsDataStore.getPushRadioOption().storeId);
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);

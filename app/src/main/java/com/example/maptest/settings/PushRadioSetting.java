@@ -3,12 +3,12 @@ package com.example.maptest.settings;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-public class PushRadioSettings {
+public class PushRadioSetting {
     private static final String TAG = "PushRadioSettings";
     public static final String PUSH_RADIO_KEY = "push_notification_radio_key";
     public final PushRadioOption pushRadioDefault;
 
-    public PushRadioSettings() {
+    public PushRadioSetting() {
         this.pushRadioDefault = PushRadioOption.OFF;
     }
 

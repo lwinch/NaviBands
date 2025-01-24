@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import com.example.maptest.broadcastReceivers.MapsNotificationBroadcastReceiver;
 import com.example.maptest.notifications.ForegroundNotificationChannel;
 import com.example.maptest.settings.PushRadioOption;
-import com.example.maptest.settings.PushRadioSettings;
 
 import jashgopani.github.io.mibandsdk.MiBand;
 

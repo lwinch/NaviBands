@@ -28,7 +28,7 @@ public class MajorSeekBarChangeListener implements SeekBar.OnSeekBarChangeListen
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         progress = MathUtils.clamp(progress, res.getInteger(R.integer.second_unit_min_x10), res.getInteger(R.integer.second_unit_max_x10));
         int currentThreshold_x10 = roundTo(progress, res.getInteger(R.integer.second_unit_interval_x10));
-        settingsDataStore.updateMajorDistanceThreshold_x10(currentThreshold_x10);
+        settingsDataStore.majorDistSetting.update_x10(currentThreshold_x10);
         String thresholdText = currentThreshold_x10 / 10. + res.getString(R.string.second_distance_unit);
         thresholdTvMajor.setText(thresholdText);
         thresholdTvMajor.setTextColor(Color.RED);
