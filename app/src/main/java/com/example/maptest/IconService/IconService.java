@@ -100,21 +100,21 @@ public class IconService {
 
     private HashMap<String, Direction> mapDirectionData() {
         HashMap<String, Direction> directionData = new HashMap<>();
-        directionData.put(Directions.ARRIVED, new Direction(Directions.ARRIVED, "Arrived", "\uD83D\uDCCD"));
-        directionData.put(Directions.STRAIGHT, new Direction(Directions.STRAIGHT, "Straight", "️⬆️"));
+        directionData.put(Directions.ARRIVED, Direction.ARRIVED);
+        directionData.put(Directions.STRAIGHT, Direction.STRAIGHT);
 
-        directionData.put(Directions.SHARP_RIGHT, new Direction(Directions.SHARP_RIGHT, "Sharp right", "↘️"));
-        directionData.put(Directions.RIGHT, new Direction(Directions.RIGHT, "Right", "➡️"));
-        directionData.put(Directions.SLIGHT_RIGHT, new Direction(Directions.SLIGHT_RIGHT, "Slight right", "↗️"));
-        directionData.put(Directions.U_RIGHT, new Direction(Directions.U_RIGHT, "U-turn right", "↩️"));
+        directionData.put(Directions.SHARP_RIGHT, Direction.SHARP_RIGHT);
+        directionData.put(Directions.RIGHT,  Direction.RIGHT);
+        directionData.put(Directions.SLIGHT_RIGHT, Direction.SLIGHT_RIGHT);
+        directionData.put(Directions.U_RIGHT, Direction.U_RIGHT);
 
-        directionData.put(Directions.SLIGHT_LEFT,  new Direction(Directions.SLIGHT_LEFT, "Slight Left", "↖️"));
-        directionData.put(Directions.LEFT, new Direction(Directions.LEFT, "Left", "⬅️"));
-        directionData.put(Directions.SHARP_LEFT, new Direction(Directions.SHARP_LEFT, "Sharp left", "↙️"));
-        directionData.put(Directions.U_LEFT, new Direction(Directions.U_LEFT, "U-turn left", "↪️"));
+        directionData.put(Directions.SLIGHT_LEFT, Direction.SLIGHT_LEFT);
+        directionData.put(Directions.LEFT,  Direction.LEFT);
+        directionData.put(Directions.SHARP_LEFT,  Direction.SHARP_LEFT);
+        directionData.put(Directions.U_LEFT,  Direction.U_LEFT);
 
-        directionData.put(Directions.ALTERNATE, new Direction(Directions.ALTERNATE, "Alternate route", "❗"));
-        directionData.put(Directions.UNKNOWN, new Direction(Directions.UNKNOWN, "Unknown", "❗"));
+        directionData.put(Directions.ALTERNATE, Direction.ALTERNATE);
+        directionData.put(Directions.UNKNOWN,  Direction.UNKNOWN);
         return directionData;
     }
 

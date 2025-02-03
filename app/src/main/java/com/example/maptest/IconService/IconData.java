@@ -10,7 +10,7 @@ public class IconData {
     public IconData(int resId, ArrayList<Integer> bitmapData) {
         this.resId = resId;
         this.bitmapData = bitmapData;
-        direction = new Direction(Directions.UNKNOWN, "Unknown", "❓");
+        direction = Direction.UNKNOWN;
     }
 
     public int getResId() {

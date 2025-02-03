@@ -66,7 +66,7 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                 direction = iconData.getDirection().getLongName();
                 break;
             case CHAR:
-                direction = "test";
+                direction = iconData.getDirection().getSymbol();
                 break;
             case SHORT_TXT:
             default:
@@ -102,7 +102,7 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                         (minorUnitDistance <= minorThreshold) ||
                         (minorUnitDistance <= majorThreshold * conversionFactor))) {
 
-                    directionsNotificationChannel.sendNotification(context, msg, text, iconRes, icon);
+                    directionsNotificationChannel.sendNotification(context, msg, iconData.getDirection().getBigSymbol(), iconRes, icon);
                     Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
                     lastMinorUnitDist = minorUnitDistance;
                 }
