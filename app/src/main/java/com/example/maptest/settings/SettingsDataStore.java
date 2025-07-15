@@ -14,24 +14,37 @@ public class SettingsDataStore {
     //public LiveData<Integer> distThresholdFlow = _distThresholdFlow;
     public final MinorDistSetting minorDistSetting;
     public final MajorDistSetting majorDistSetting;
-    public final PushRadioSetting pushRadioSetting;
+    public final RadioSetting<PushTitleRadioOption> pushTitleRadioSetting;
+    public final RadioSetting<PushTextRadioOption> pushTextRadioSetting;
 
     private SettingsDataStore(Context context) {
         this.sharedPreferences = context.getApplicationContext().getSharedPreferences(USER_PREFERENCES_NAME, Context.MODE_PRIVATE);
         this.minorDistSetting = new MinorDistSetting(context, sharedPreferences);
         this.majorDistSetting = new MajorDistSetting(context, sharedPreferences);
-        this.pushRadioSetting = new PushRadioSetting();
+        this.pushTitleRadioSetting = new RadioSetting<>("PushTitleRadioSettings",
+            "push_notification_title_radio_key",
+            PushTitleRadioOption.defaultValue());
+        this.pushTextRadioSetting = new RadioSetting<>("PushTextRadioSettings",
+            "push_notification_text_radio_key",
+            PushTextRadioOption.defaultValue());
         //_distThresholdFlow.setValue(getDistanceThreshold());
     }
 
-    public PushRadioOption getPushRadioOption() {
-        return pushRadioSetting.get(sharedPreferences);
+    public RadioOption getPushTitleRadioOption() {
+        return pushTitleRadioSetting.get(sharedPreferences);
     }
 
-    public void updatePushRadioSetting(PushRadioOption option) {
-        pushRadioSetting.set(sharedPreferences, option);
+    public void updatePushTitleRadioSetting(PushTitleRadioOption option) {
+        pushTitleRadioSetting.set(sharedPreferences, option);
     }
 
+    public RadioOption getPushTextRadioOption() {
+        return pushTextRadioSetting.get(sharedPreferences);
+    }
+
+    public void updatePushTextRadioSetting(PushTextRadioOption option) {
+        pushTextRadioSetting.set(sharedPreferences, option);
+    }
     private static final AtomicReference<SettingsDataStore> INSTANCE = new AtomicReference<>();
 
     public static SettingsDataStore getInstance(@NonNull Context context) {

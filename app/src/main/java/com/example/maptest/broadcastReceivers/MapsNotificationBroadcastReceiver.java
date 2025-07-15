@@ -13,7 +13,8 @@ import com.example.maptest.IconService.IconData;
 import com.example.maptest.IconService.IconService;
 import com.example.maptest.R;
 import com.example.maptest.notifications.DirectionsNotificationChannel;
-import com.example.maptest.settings.PushRadioOption;
+import com.example.maptest.settings.PushTextRadioOption;
+import com.example.maptest.settings.PushTitleRadioOption;
 
 import java.util.Arrays;
 
@@ -23,7 +24,8 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
     private final IconService iconService;
     private int minorThreshold = 0;
     private double majorThreshold = 0.;
-    private PushRadioOption pushRadioOption;
+    private PushTitleRadioOption pushTitleRadioOption;
+    private PushTextRadioOption pushTextRadioOption;
     private double lastMinorUnitDist = 0.;
 
     public MapsNotificationBroadcastReceiver(Context context) {
@@ -31,10 +33,11 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
         this.iconService = new IconService(context);
     }
 
-    public void updateSettings(int minorThreshold, double majorThreshold, PushRadioOption option) {
+    public void updateSettings(int minorThreshold, double majorThreshold, PushTitleRadioOption titleOption, PushTextRadioOption textOption) {
         this.minorThreshold = minorThreshold;
         this.majorThreshold = majorThreshold;
-        this.pushRadioOption = option;
+        this.pushTitleRadioOption = titleOption;
+        this.pushTextRadioOption = textOption;
     }
 
     @Override
@@ -58,7 +61,7 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
             iconData = new IconData(R.drawable.notification_icon, null);
         }
         String direction;
-        switch (this.pushRadioOption) {
+        switch (this.pushTitleRadioOption) {
             case EMOJI:
                 direction = iconData.getDirection().getEmoji();
                 break;
@@ -73,6 +76,19 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                 direction = iconData.getDirection().getShortName();
                 break;
         }
+        String directionBodyInfo;
+        switch (this.pushTextRadioOption) {
+            case CHAR:
+                directionBodyInfo = iconData.getDirection().getSymbol();
+                break;
+            case INSTINCT2:
+                directionBodyInfo = iconData.getDirection().getBigSymbol();
+                break;
+            default:
+                directionBodyInfo = text;
+                break;
+        }
+
         int iconRes = iconData.getResId();
         StringBuilder newData = new StringBuilder();
         if (title != null && title.indexOf(" ") > 0) {
@@ -97,12 +113,12 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                     minorUnitDistance = distance * conversionFactor;
                 }
 
-                if (this.pushRadioOption != PushRadioOption.OFF &&
+                if (this.pushTitleRadioOption != PushTitleRadioOption.OFF &&
                         ((minorUnitDistance > lastMinorUnitDist) ||
                         (minorUnitDistance <= minorThreshold) ||
                         (minorUnitDistance <= majorThreshold * conversionFactor))) {
 
-                    directionsNotificationChannel.sendNotification(context, msg, iconData.getDirection().getBigSymbol(), iconRes, icon);
+                    directionsNotificationChannel.sendNotification(context, msg, directionBodyInfo, iconRes, icon);
                     Toast.makeText(context, "<< directions sent >>", Toast.LENGTH_SHORT).show();
                     lastMinorUnitDist = minorUnitDistance;
                 }
@@ -111,12 +127,12 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
                 Log.e(TAG, Arrays.toString(e.getStackTrace()));
             }
         } else if (title != null) {
-            if (this.pushRadioOption != PushRadioOption.OFF) {
+            if (this.pushTitleRadioOption != PushTitleRadioOption.OFF) {
                 directionsNotificationChannel.sendNotification(context, title, text, iconRes, icon);
                 newData.append(title).append("\n").append(text).append("\n\n");
             }
         }
-
+        //I think this sends logging back to the main app
         //TODO: use  DataUpdateListener?
         context.sendBroadcast(new Intent(DIRECTION_BROADCAST).putExtra("newData", newData.toString()));
     }

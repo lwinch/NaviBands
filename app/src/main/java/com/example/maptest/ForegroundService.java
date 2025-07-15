@@ -15,7 +15,8 @@ import androidx.annotation.Nullable;
 
 import com.example.maptest.broadcastReceivers.MapsNotificationBroadcastReceiver;
 import com.example.maptest.notifications.ForegroundNotificationChannel;
-import com.example.maptest.settings.PushRadioOption;
+import com.example.maptest.settings.PushTextRadioOption;
+import com.example.maptest.settings.PushTitleRadioOption;
 
 import jashgopani.github.io.mibandsdk.MiBand;
 
@@ -46,8 +47,9 @@ public class ForegroundService extends Service {
         stopForeground(flags);
         int currentMinorThreshold = intent.getIntExtra("currentMinorThreshold", 500);
         double currentMajorThreshold = intent.getDoubleExtra("currentMajorThreshold", 1.);
-        PushRadioOption pushOption = PushRadioOption.fromString(intent.getStringExtra("pushNotificationSetting"));
-        this.mapsNotificationBroadcastReceiver.updateSettings(currentMinorThreshold, currentMajorThreshold, pushOption);
+        PushTitleRadioOption pushTitleOption = PushTitleRadioOption.defaultValue().fromString(intent.getStringExtra("pushNotificationTitleSetting"));
+        PushTextRadioOption pushTextOption = PushTextRadioOption.defaultValue().fromString(intent.getStringExtra("pushNotificationTextSetting"));
+        this.mapsNotificationBroadcastReceiver.updateSettings(currentMinorThreshold, currentMajorThreshold, pushTitleOption, pushTextOption);
         String notificationText = text  + "\nDistance threshold: " + currentMinorThreshold;
         Notification notification = ForegroundNotificationChannel.getForegroundNotification(this, title, notificationText);
         startForeground(420, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);

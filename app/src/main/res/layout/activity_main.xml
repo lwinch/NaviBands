@@ -130,7 +130,48 @@
             android:layout_columnWeight="1"
             android:layout_gravity="fill|center"
             android:layout_marginTop="16dp"
-            android:text="Push Notifications"
+            android:text="Push Notification Title"
+            android:textAlignment="center" />
+
+        <RadioGroup
+            android:layout_width="0dp"
+            android:id="@+id/radio_push_title_setting_group"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/radio_title_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Off"/>
+            <RadioButton android:id="@+id/radio_title_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="emoji"/>
+            <RadioButton android:id="@+id/radio_title_long_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Long text"/>
+            <RadioButton android:id="@+id/radio_title_short_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Short text"/>
+            <RadioButton android:id="@+id/radio_title_character"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="character"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center"
+            android:layout_marginTop="16dp"
+            android:text="Push Notification Content"
             android:textAlignment="center" />
 
         <RadioGroup
@@ -142,26 +183,22 @@
             android:layout_gravity="fill|center"
             android:gravity="center"
             android:orientation="horizontal">
-            <RadioButton android:id="@+id/radio_off"
+            <RadioButton android:id="@+id/radio_text_off"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Off"/>
-            <RadioButton android:id="@+id/radio_emoji"
+            <RadioButton android:id="@+id/radio_text_street"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="emoji"/>
-            <RadioButton android:id="@+id/radio_long_text"
+                android:text="Street"/>
+            <RadioButton android:id="@+id/radio_text_instinct2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Long text"/>
-            <RadioButton android:id="@+id/radio_short_text"
+                android:text="Instinct 2"/>
+            <RadioButton android:id="@+id/radio_text_char"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Short text"/>
-            <RadioButton android:id="@+id/radio_character"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="character"/>
+                android:text="Character"/>
         </RadioGroup>
 
         <TextView

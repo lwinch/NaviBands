@@ -37,7 +37,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.maptest.IconService.Directions;
-import com.example.maptest.settings.PushRadioOption;
+import com.example.maptest.settings.PushTextRadioOption;
+import com.example.maptest.settings.PushTitleRadioOption;
 import com.example.maptest.settings.SettingsDataStore;
 import com.example.maptest.uiListeners.MajorSeekBarChangeListener;
 import com.example.maptest.uiListeners.MinorSeekBarChangeListener;
@@ -63,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
     Button gotoConnectBtn;
     SeekBar thresholdSbMinor;
     SeekBar thresholdSbMajor;
-    RadioGroup pushSettingGroup;
-    RadioButton pushOffRadio, pushEmojiRadio, pushLongRadio, pushShortRadio, pushCharRadio;
+    RadioGroup pushTitleSettingGroup;
+    RadioGroup pushTextSettingGroup;
+    RadioButton pushTitleOffRadio, pushTitleEmojiRadio, pushTitleLongRadio, pushTitleShortRadio, pushTitleCharRadio;
+    RadioButton pushTextOffRadio, pushTextStreetRadio, pushTextInstinct2Radio, pushTextCharRadio;
 //    private LiveData<Double> currentThreshold;
     boolean monitoringMode;
     MiBand miband;
@@ -110,12 +113,20 @@ public class MainActivity extends AppCompatActivity {
         statusTv = findViewById(R.id.statusTv);
         thresholdSbMinor = findViewById(R.id.thresholdSeekMinor);
         thresholdSbMajor = findViewById(R.id.thresholdSeekMajor);
-        pushSettingGroup = findViewById(R.id.radio_push_setting_group);
-        pushOffRadio = findViewById(R.id.radio_off);
-        pushEmojiRadio = findViewById(R.id.radio_emoji);
-        pushLongRadio = findViewById(R.id.radio_long_text);
-        pushShortRadio = findViewById(R.id.radio_short_text);
-        pushCharRadio = findViewById(R.id.radio_character);
+        pushTitleSettingGroup = findViewById(R.id.radio_push_title_setting_group);
+        pushTitleOffRadio = findViewById(R.id.radio_title_off);
+        pushTitleEmojiRadio = findViewById(R.id.radio_title_emoji);
+        pushTitleLongRadio = findViewById(R.id.radio_title_long_text);
+        pushTitleShortRadio = findViewById(R.id.radio_title_short_text);
+        pushTitleCharRadio = findViewById(R.id.radio_title_character);
+
+        pushTextSettingGroup = findViewById(R.id.radio_push_setting_group);
+        pushTextOffRadio = findViewById(R.id.radio_text_off);
+        pushTextStreetRadio = findViewById(R.id.radio_text_street);
+        pushTextInstinct2Radio = findViewById(R.id.radio_text_instinct2);
+        pushTextCharRadio = findViewById(R.id.radio_text_char);
+
+
         thresholdTvMinor = findViewById(R.id.thresholdTvMinor);
         thresholdTvMajor = findViewById(R.id.thresholdTvMajor);
         gotoConnectBtn = findViewById(R.id.gotoConnectBtn);
@@ -140,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
         thresholdTvMinor.setText(minorThresholdText);
         thresholdTvMajor.setText(majorThresholdText);
 
-        pushSettingGroup.check(settingsDataStore.getPushRadioOption().resId);
+        pushTitleSettingGroup.check(settingsDataStore.getPushTitleRadioOption().getResId());
+        pushTextSettingGroup.check(settingsDataStore.getPushTextRadioOption().getResId());
 
         //For MiBand
         miband = MiBand.getInstance(MainActivity.this);
@@ -185,11 +197,16 @@ public class MainActivity extends AppCompatActivity {
         thresholdSbMinor.setOnSeekBarChangeListener(new MinorSeekBarChangeListener(res, settingsDataStore, thresholdTvMinor));
         thresholdSbMajor.setOnSeekBarChangeListener(new MajorSeekBarChangeListener(res, settingsDataStore, thresholdTvMajor));
 
-        pushOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.OFF, settingsDataStore));
-        pushEmojiRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.EMOJI, settingsDataStore));
-        pushLongRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.LONG_TXT, settingsDataStore));
-        pushShortRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.SHORT_TXT, settingsDataStore));
-        pushCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushRadioOption.CHAR, settingsDataStore));
+        pushTitleOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.OFF, settingsDataStore));
+        pushTitleEmojiRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.EMOJI, settingsDataStore));
+        pushTitleLongRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.LONG_TXT, settingsDataStore));
+        pushTitleShortRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.SHORT_TXT, settingsDataStore));
+        pushTitleCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.CHAR, settingsDataStore));
+
+        pushTextOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.OFF, settingsDataStore));
+        pushTextStreetRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.STREET, settingsDataStore));
+        pushTextInstinct2Radio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.INSTINCT2, settingsDataStore));
+        pushTextCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.CHAR, settingsDataStore));
 
         gotoConnectBtn.setOnClickListener(v-> {
             Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);
@@ -260,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("text", "Navigation Mode ON");
         intent.putExtra("currentMinorThreshold", settingsDataStore.minorDistSetting.get());
         intent.putExtra("currentMajorThreshold", settingsDataStore.majorDistSetting.get());
-        intent.putExtra("pushNotificationSetting", settingsDataStore.getPushRadioOption().storeId);
+        intent.putExtra("pushNotificationTitleSetting", settingsDataStore.getPushTitleRadioOption().getStoreId());
+        intent.putExtra("pushNotificationTextSetting", settingsDataStore.getPushTextRadioOption().getStoreId());
         ContextCompat.startForegroundService(context, intent);
         Log.d(TAG, "startForegroundService: " + R.string.monitoring_on);
     }

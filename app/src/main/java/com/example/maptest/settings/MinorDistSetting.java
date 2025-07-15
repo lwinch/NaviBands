@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.example.maptest.R;
 
 public class MinorDistSetting {
-
     private static final String MINOR_DIST_THRESHOLD_KEY = "minor_dist_threshold_key";
     private final int minorDistThresholdDefault;
     private final SharedPreferences sharedPreferences;
