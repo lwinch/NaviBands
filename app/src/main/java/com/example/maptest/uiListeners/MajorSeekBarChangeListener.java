@@ -11,8 +11,6 @@ import com.example.maptest.R;
 import com.example.maptest.settings.SettingsDataStore;
 
 public class MajorSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-    private static final String TAG = "MajorSeekBarChangeListener";
-
     private final Resources res;
     private final SettingsDataStore settingsDataStore;
     private final TextView thresholdTvMajor;

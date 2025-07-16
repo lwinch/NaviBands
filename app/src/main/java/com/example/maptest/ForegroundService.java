@@ -47,8 +47,8 @@ public class ForegroundService extends Service {
         stopForeground(flags);
         int currentMinorThreshold = intent.getIntExtra("currentMinorThreshold", 500);
         double currentMajorThreshold = intent.getDoubleExtra("currentMajorThreshold", 1.);
-        PushTitleRadioOption pushTitleOption = PushTitleRadioOption.defaultValue().fromString(intent.getStringExtra("pushNotificationTitleSetting"));
-        PushTextRadioOption pushTextOption = PushTextRadioOption.defaultValue().fromString(intent.getStringExtra("pushNotificationTextSetting"));
+        PushTitleRadioOption pushTitleOption = PushTitleRadioOption.fromString(intent.getStringExtra("pushNotificationTitleSetting"));
+        PushTextRadioOption pushTextOption = PushTextRadioOption.fromString(intent.getStringExtra("pushNotificationTextSetting"));
         this.mapsNotificationBroadcastReceiver.updateSettings(currentMinorThreshold, currentMajorThreshold, pushTitleOption, pushTextOption);
         String notificationText = text  + "\nDistance threshold: " + currentMinorThreshold;
         Notification notification = ForegroundNotificationChannel.getForegroundNotification(this, title, notificationText);
