@@ -84,9 +84,11 @@ public class MapsNotificationBroadcastReceiver extends BroadcastReceiver {
             case INSTINCT2:
                 directionBodyInfo = iconData.getDirection().getBigSymbol();
                 break;
-            default:
+            case STREET:
                 directionBodyInfo = text;
                 break;
+            default:
+                directionBodyInfo = "";
         }
 
         int iconRes = iconData.getResId();

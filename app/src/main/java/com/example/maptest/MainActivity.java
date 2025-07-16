@@ -197,16 +197,16 @@ public class MainActivity extends AppCompatActivity {
         thresholdSbMinor.setOnSeekBarChangeListener(new MinorSeekBarChangeListener(res, settingsDataStore, thresholdTvMinor));
         thresholdSbMajor.setOnSeekBarChangeListener(new MajorSeekBarChangeListener(res, settingsDataStore, thresholdTvMajor));
 
-        pushTitleOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.OFF, settingsDataStore));
-        pushTitleEmojiRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.EMOJI, settingsDataStore));
-        pushTitleLongRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.LONG_TXT, settingsDataStore));
-        pushTitleShortRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.SHORT_TXT, settingsDataStore));
-        pushTitleCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushTitleRadioOption.CHAR, settingsDataStore));
+        pushTitleOffRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTitleRadioOption.OFF, settingsDataStore::updatePushTitleRadioSetting));
+        pushTitleEmojiRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTitleRadioOption.EMOJI, settingsDataStore::updatePushTitleRadioSetting));
+        pushTitleLongRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTitleRadioOption.LONG_TXT, settingsDataStore::updatePushTitleRadioSetting));
+        pushTitleShortRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTitleRadioOption.SHORT_TXT, settingsDataStore::updatePushTitleRadioSetting));
+        pushTitleCharRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTitleRadioOption.CHAR, settingsDataStore::updatePushTitleRadioSetting));
 
-        pushTextOffRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.OFF, settingsDataStore));
-        pushTextStreetRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.STREET, settingsDataStore));
-        pushTextInstinct2Radio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.INSTINCT2, settingsDataStore));
-        pushTextCharRadio.setOnCheckedChangeListener(new PushRadioListener(PushTextRadioOption.CHAR, settingsDataStore));
+        pushTextOffRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTextRadioOption.OFF, settingsDataStore::updatePushTextRadioSetting));
+        pushTextStreetRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTextRadioOption.STREET, settingsDataStore::updatePushTextRadioSetting));
+        pushTextInstinct2Radio.setOnCheckedChangeListener(new PushRadioListener<>(PushTextRadioOption.INSTINCT2, settingsDataStore::updatePushTextRadioSetting));
+        pushTextCharRadio.setOnCheckedChangeListener(new PushRadioListener<>(PushTextRadioOption.CHAR, settingsDataStore::updatePushTextRadioSetting));
 
         gotoConnectBtn.setOnClickListener(v-> {
             Intent intent = new Intent(MainActivity.this, BandConnectActivity.class);

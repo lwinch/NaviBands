@@ -22,11 +22,13 @@ public class SettingsDataStore {
         this.minorDistSetting = new MinorDistSetting(context, sharedPreferences);
         this.majorDistSetting = new MajorDistSetting(context, sharedPreferences);
         this.pushTitleRadioSetting = new RadioSetting<>("PushTitleRadioSettings",
-            "push_notification_title_radio_key",
-            PushTitleRadioOption.defaultValue());
+                "push_notification_title_radio_key",
+                PushTitleRadioOption.defaultValue(),
+                PushTitleRadioOption::fromString);
         this.pushTextRadioSetting = new RadioSetting<>("PushTextRadioSettings",
-            "push_notification_text_radio_key",
-            PushTextRadioOption.defaultValue());
+                "push_notification_text_radio_key",
+                PushTextRadioOption.defaultValue(),
+                PushTextRadioOption::fromString);
         //_distThresholdFlow.setValue(getDistanceThreshold());
     }
 

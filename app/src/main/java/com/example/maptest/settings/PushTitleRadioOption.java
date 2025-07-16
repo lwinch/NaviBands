@@ -16,10 +16,10 @@ public enum PushTitleRadioOption implements RadioOption {
         this.resId = resId;
     }
 
-    public PushTitleRadioOption fromString(String storeId) {
-        for (PushTitleRadioOption pushTitleRadioOption : PushTitleRadioOption.values()) {
-            if (pushTitleRadioOption.storeId.equals(storeId)) {
-                return pushTitleRadioOption;
+    public static PushTitleRadioOption fromString(String storeId) {
+        for (PushTitleRadioOption option : values()) {
+            if (option.storeId.equals(storeId)) {
+                return option;
             }
         }
         throw new IllegalArgumentException("No constant with text " + storeId + " found");
