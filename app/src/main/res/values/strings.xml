@@ -13,6 +13,17 @@
     <string name="connect_mi_band">Connect MiBand</string>
     <string name="vibrate_distance_minor">Select the notification threshold (minor units)</string>
     <string name="vibrate_distance_major">Select the notification threshold (major units)</string>
+    <string name="push_notification_title">Push Notification Title</string>
+    <string name="push_notification_title_off">Off</string>
+    <string name="push_notification_title_emoji">Emoji</string>
+    <string name="push_notification_title_long_text">Long text</string>
+    <string name="push_notification_title_short_text">Short text</string>
+    <string name="push_notification_title_character">Character</string>
+    <string name="push_notification_text">Push Notification Text</string>
+    <string name="push_notification_text_off">Off</string>
+    <string name="push_notification_text_street">Street</string>
+    <string name="push_notification_text_big_symbol">Big Symbol</string>
+    <string name="push_notification_text_character">Character</string>
 
     <!--MiBand connect layout-->
     <string name="status0">No device connected</string>

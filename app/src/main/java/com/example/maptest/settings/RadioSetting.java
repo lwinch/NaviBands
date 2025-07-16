@@ -24,14 +24,6 @@ public class RadioSetting<T extends RadioOption> {
         return fromStringFunction.apply(storedValue);
     }
 
-//    public boolean get(SharedPreferences sharedPreferences, RadioOption option) {
-//        boolean bool = option == this.pushRadioDefault.fromString(sharedPreferences.getString(PUSH_RADIO_KEY, pushRadioDefault.getStoreId()));
-//        Log.d(TAG, "get called option: " + option.getStoreId());
-//        Log.d(TAG, "get called current value: " + sharedPreferences.getString(PUSH_RADIO_KEY, pushRadioDefault.getStoreId()));
-//        Log.d(TAG, "get called match: " + bool);
-//        return bool;
-//    }
-
     public void set(SharedPreferences sharedPreferences, RadioOption radioOption) {
         Log.d(TAG, "set called: " + radioOption.getStoreId());
         sharedPreferences.edit().putString(PUSH_RADIO_KEY, radioOption.getStoreId()).apply();

@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="start"
     android:animateLayoutChanges="true"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <GridLayout
@@ -80,7 +81,7 @@
         <SeekBar
             android:id="@+id/thresholdSeekMinor"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_columnSpan="1"
             android:layout_columnWeight="1"
             android:layout_gravity="fill"
@@ -116,7 +117,7 @@
         <SeekBar
             android:id="@+id/thresholdSeekMajor"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_columnSpan="1"
             android:layout_columnWeight="1"
             android:layout_gravity="center_vertical"
@@ -130,7 +131,7 @@
             android:layout_columnWeight="1"
             android:layout_gravity="fill|center"
             android:layout_marginTop="16dp"
-            android:text="Push Notification Title"
+            android:text="@string/push_notification_title"
             android:textAlignment="center" />
 
         <RadioGroup
@@ -144,24 +145,24 @@
             android:orientation="horizontal">
             <RadioButton android:id="@+id/radio_title_off"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Off"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_title_off"/>
             <RadioButton android:id="@+id/radio_title_emoji"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="emoji"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_title_emoji"/>
             <RadioButton android:id="@+id/radio_title_long_text"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Long text"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_title_long_text"/>
             <RadioButton android:id="@+id/radio_title_short_text"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Short text"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_title_short_text"/>
             <RadioButton android:id="@+id/radio_title_character"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="character"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_title_character"/>
         </RadioGroup>
 
         <TextView
@@ -171,7 +172,7 @@
             android:layout_columnWeight="1"
             android:layout_gravity="fill|center"
             android:layout_marginTop="16dp"
-            android:text="Push Notification Content"
+            android:text="@string/push_notification_text"
             android:textAlignment="center" />
 
         <RadioGroup
@@ -185,20 +186,20 @@
             android:orientation="horizontal">
             <RadioButton android:id="@+id/radio_text_off"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Off"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_text_off"/>
             <RadioButton android:id="@+id/radio_text_street"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Street"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_text_street"/>
             <RadioButton android:id="@+id/radio_text_instinct2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Instinct 2"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_text_big_symbol"/>
             <RadioButton android:id="@+id/radio_text_char"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Character"/>
+                android:layout_height="48dp"
+                android:text="@string/push_notification_text_character"/>
         </RadioGroup>
 
         <TextView
@@ -280,7 +281,7 @@
             android:background="@android:color/holo_green_light"
             android:text="Vibration Setting"
             android:textAlignment="center"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:layout_width="0dp"
@@ -296,7 +297,7 @@
         <Spinner
             android:id="@+id/vibrateOnlySpinner"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_columnSpan="1"
             android:layout_columnWeight="1"
             android:layout_gravity="fill|center"
@@ -313,6 +314,7 @@
             android:layout_marginTop="16dp"
             android:background="@android:color/holo_orange_light"
             android:text="Test Vibrations"
+            android:textColor="@android:color/black"
             android:textAlignment="center" />
 
         <Button
